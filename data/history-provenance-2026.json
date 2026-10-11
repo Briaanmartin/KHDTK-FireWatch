@@ -6,7 +6,7 @@
   "provider": "NASA VIIRS Collection 2, University of Maryland monthly science archive",
   "documentation_url": "https://ladsweb.modaps.eosdis.nasa.gov/archive/Document%20Archive/Science%20Data%20Product%20Documentation/VIIRS_C2_AF-375m_User_Guide_1.0.pdf",
   "boundary_file": "boundary.geojson",
-  "boundary_sha256": "334cfc9a4f20cd30e6fa9b9e38bab67ab44f1247f086bfc04e016014e86b0a46",
+  "boundary_sha256": "0f8a46ababa6f65d6842ac10bbad853592aa0e6e9b98b67be93c53d2fe859ca9",
   "target_archive_file": "history-2026.json",
   "spatial_method": "Only detection coordinates inside or on the supplied AOI polygon are retained; no buffer is included.",
   "time_semantics": "UTC acquisition times and half-open source coverage intervals [coverage_start, coverage_end). The website reports local time in Asia/Makassar (UTC+08:00).",
@@ -921,5 +921,6 @@
       "filtered_csv_sha256": "8520f4e3793341e14aa2361481da5232eed87cf14be22b712234eb84482d898f"
     }
   ],
-  "boundary_hash_method": "SHA-256 of boundary.geojson file bytes"
+  "boundary_hash_method": "SHA-256 of polygon coordinate arrays serialized as UTF-8 JSON with sorted keys and compact separators; identical to history.py boundary_context and independent of file line endings",
+  "published_boundary_file_sha256": "de81e12142365fad7bcf270446ab0dd115c354ad2491c4710f43d3f399b06773"
 }
