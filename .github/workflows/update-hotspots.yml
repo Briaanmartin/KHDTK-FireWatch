@@ -1,0 +1,57 @@
+name: Update NASA FIRMS hotspots
+
+on:
+  schedule:
+    - cron: '23 * * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: update-nasa-firms-hotspots
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check out default branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.repository.default_branch }}
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Fetch and filter NASA FIRMS data
+        run: python scripts/update-hotspots.py
+      - name: Commit data and status
+        shell: bash
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add data/hotspots.geojson data/hotspots-status.json
+          if ! git diff --cached --quiet; then
+            git commit -m 'data: refresh NASA FIRMS hotspots'
+            git push
+          fi
+      - name: Report upstream data health
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+          status = json.loads(Path('data/hotspots-status.json').read_text())
+          summary = f"NASA FIRMS: **{status['state']}** — {status['feature_count']} detections, {status['inside_count']} inside KHDTK. Checked: {status['checked_at']}\n\n"
+          for source in status['sources']:
+              summary += f"- {source['name']}: {source['state']}"
+              if source.get('error'):
+                  print(f"::warning::{source['name']}: {source['error']}")
+                  summary += f" — {source['error']}"
+              summary += '\n'
+          with open(os.environ['GITHUB_STEP_SUMMARY'], 'a') as output:
+              output.write(summary)
+          PY

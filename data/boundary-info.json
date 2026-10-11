@@ -1,0 +1,69 @@
+{
+  "name": "KHDTK Diklathut Fahutan Unmul Lempake",
+  "generatedAt": "2026-10-11T14:50:15.634725Z",
+  "coordinateReferenceSystem": "EPSG:4326",
+  "coordinateOrder": "longitude, latitude",
+  "bbox": [
+    117.20321128008665,
+    -0.45952100874970453,
+    117.22657076749131,
+    -0.43830459358398816
+  ],
+  "center": [
+    117.2152940492985,
+    -0.44883709711744263
+  ],
+  "areaHa": 313.8291,
+  "boundary": {
+    "file": "boundary.geojson",
+    "sourceFile": "AOI KRUS.shp",
+    "sourceCrs": "EPSG:23880",
+    "sourceCrsName": "DGN95 / UTM zone 50S",
+    "featureCount": 1,
+    "originalCoordinateCount": 8,
+    "coordinateCount": 6,
+    "processing": "Reproyeksi dari CRS pada .prj ke WGS84; duplikasi koordinat berurutan dihapus tanpa mengubah geometri.",
+    "transformDescription": "Inverse of UTM zone 50S + DGN95 to WGS 84 (1) (with axis order normalized for visualization)",
+    "transformAccuracyM": 1.0,
+    "maxRoundtripErrorM": 0.0
+  },
+  "aoi": {
+    "file": "aoi.geojson",
+    "sourceFile": "KHDTK .kml",
+    "featureCount": 1,
+    "bbox": [
+      117.1988802237401,
+      -0.4637426099537906,
+      117.2309494981586,
+      -0.4342414538579135
+    ],
+    "areaHa": 598.7504,
+    "coversBoundary": true,
+    "referencePoints": [
+      {
+        "sourceName": "Penanda letak tanpa judul",
+        "coordinates": [
+          117.2124382357951,
+          -0.4363014560909554
+        ]
+      },
+      {
+        "sourceName": "Penanda letak tanpa judul",
+        "coordinates": [
+          117.2000450021105,
+          -0.4502477913933977
+        ]
+      },
+      {
+        "sourceName": "Penanda letak tanpa judul",
+        "coordinates": [
+          117.2184839422885,
+          -0.461996048519542
+        ]
+      }
+    ],
+    "note": "Poligon KML lebih luas dan ditampilkan sebagai area referensi terpisah dari batas SHP."
+  },
+  "areaMethod": "Luas geodesik pada ellipsoid WGS84, dalam hektare.",
+  "sourceAttribution": "Batas dan area referensi berasal dari berkas yang diunggah pengguna."
+}
