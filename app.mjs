@@ -1,9 +1,9 @@
 import {insideBoundary, distanceToBoundaryKm, normalizeConfidence, filterDetections, toCSV} from './core.mjs';
+import {fireIcon, FIRE_SVG} from './hotspot-icon.mjs';
 
 const $ = id => document.getElementById(id);
 const NAME = 'KHDTK Diklathut Fahutan Unmul Lempake';
 const labels = {high:'Tinggi',nominal:'Nominal',low:'Rendah',unknown:'Tidak diketahui'};
-const colors = {high:'#d5532a',nominal:'#e2a034',low:'#7996b1',unknown:'#899286'};
 const dateFormat = new Intl.DateTimeFormat('id-ID', {timeZone:'Asia/Makassar',day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit',hour12:false});
 const number = value => new Intl.NumberFormat('id-ID',{maximumFractionDigits:2}).format(value);
 const dateText = value => value && Number.isFinite(Date.parse(value)) ? dateFormat.format(new Date(value)) : 'Belum tersedia';
@@ -41,18 +41,17 @@ function setupMap() {
   boundaryLayer.bindPopup(`<span class="popup-label">BATAS DARI SHP</span><br><strong>${NAME}</strong><br>Luas geodesik: ${number(info.areaHa)} ha<br>DGN95 / UTM 50S → WGS 84`);
   boundaryLayer.bindTooltip('Batas KHDTK Lempake');
   const areaBounds=boundaryLayer.getBounds();
-  const showBoundary=()=>map.fitBounds(areaBounds.pad(.35),{padding:[24,24],animate:false});
   hotspotLayer = L.featureGroup().addTo(map);
   const toggle = (id,layer) => $(id).addEventListener('change',()=>$(id).checked ? layer.addTo(map) : map.removeLayer(layer));
   toggle('show-boundary',boundaryLayer);toggle('show-hotspots',hotspotLayer);
-  $('fit-boundary').addEventListener('click',()=>{$('show-boundary').checked=true;boundaryLayer.addTo(map);showBoundary();});
+  document.querySelectorAll('[data-fire-icon]').forEach(element=>{element.innerHTML=FIRE_SVG;});
   document.addEventListener('history:show', event=>{
     const feature=event.detail?.feature;
     if(feature?.geometry?.type!=='Point' || !insideBoundary(feature.geometry.coordinates,boundary)) return;
     const [lon,lat]=feature.geometry.coordinates,p=feature.properties || {};
     if(!Number.isFinite(Date.parse(p.detected_at))) return;
     if(historyMarker) map.removeLayer(historyMarker);
-    historyMarker=L.circleMarker([lat,lon],{radius:10,color:'#8d201e',weight:3,fillColor:'#f39c5b',fillOpacity:.9}).addTo(map);
+    historyMarker=L.marker([lat,lon],{icon:fireIcon(L,p.confidence),title:`Hotspot arsip ${p.satellite || ''} · ${dateText(p.detected_at)} WITA`}).addTo(map);
     historyMarker.bindPopup(`<span class="popup-label">DETEKSI ARSIP TAHUNAN</span><br><strong>${escapeHTML(p.satellite)}</strong><br>${dateText(p.detected_at)} WITA<br>Di dalam AOI KHDTK<br>Kepercayaan: ${labels[normalizeConfidence(p.confidence)]}<br>FRP: ${Number.isFinite(p.frp)?number(p.frp)+' MW':'Tidak tersedia'}<br>${lat.toFixed(5)}, ${lon.toFixed(5)}<br><small>Deteksi satelit; perlu verifikasi kejadian api.</small>`);
     historyMarker.on('popupclose',()=>{if(historyMarker){map.removeLayer(historyMarker);historyMarker=null;}});
     map.setView([lat,lon],15);historyMarker.openPopup();$('map').scrollIntoView({behavior:'smooth',block:'center'});
@@ -77,7 +76,8 @@ function setupMap() {
   map.on('mousemove',event=>{$('coordinates').textContent=`${event.latlng.lat.toFixed(5)}, ${event.latlng.lng.toFixed(5)} · WGS 84`;});
   map.on('mouseout',()=>{$('coordinates').textContent='WGS 84 · EPSG:4326';});
   new ResizeObserver(()=>map.invalidateSize({pan:false})).observe($('map'));
-  showBoundary();
+  // Open a regional view once; never snap back to or constrain the SHP polygon.
+  map.setView(areaBounds.getCenter(),11);
 }
 function prepareDetections(collection) {
   if (collection.type !== 'FeatureCollection' || !Array.isArray(collection.features)) throw new Error('Format data hotspot tidak valid.');
@@ -91,7 +91,7 @@ function prepareDetections(collection) {
 function renderStatus() {
   const checked = Date.parse(status?.checked_at), age = Date.now() - checked;
   const stale = !Number.isFinite(checked) || age > 6*3600000;
-  let label='Data NASA FIRMS', tone='', message='Garis merah menunjukkan batas KHDTK. Peta dapat dijelajahi bebas; ringkasan dan daftar hotspot dihitung di dalam AOI. Data NASA FIRMS diperbarui setiap jam sesuai pengamatan satelit.';
+  let label='Data NASA FIRMS', tone='', message='Garis merah menunjukkan batas KHDTK. Ikon api menandai hotspot di dalam dan sekitar kawasan hingga 25 km dari batas. Peta dapat dijelajahi bebas; pengamatan NASA FIRMS diperbarui setiap jam.';
   if (status?.state==='error') { label='Sumber belum tersedia';tone='error';message='Pengambilan data hotspot gagal. Jika tersedia, catatan terakhir tetap ditampilkan dengan status data lama. Kondisi kawasan belum dapat disimpulkan dari data ini.'; }
   else if (status?.state==='partial') { label='Sebagian sumber tersedia';tone='warn';message='Sebagian sumber NASA FIRMS gagal diperbarui. Catatan tersimpan dari sumber tersebut ditandai sebagai data lama; cakupan pengamatan belum lengkap.'; }
   else if (stale) { label='Data perlu diperbarui';tone='warn';message='Pembaruan data terakhir sudah lebih dari 6 jam atau waktunya tidak tersedia. Tabel tetap menampilkan catatan dalam periode pilihan; periksa waktu pengamatan.'; }
@@ -111,23 +111,23 @@ function renderStatus() {
 function render() {
   if (!dataLoaded) return;
   const baseOptions={hours:Number($('period').value),confidence:$('confidence').value};
-  const all=filterDetections(detections,{...baseOptions,scope:'inside'});
-  visible=filterDetections(all,{...baseOptions,scope:$('scope').value});
+  visible=filterDetections(detections,baseOptions);
+  const inside=visible.filter(f=>f.properties.inside);
   const unavailable=status.state==='error' && !detections.length;
-  $('inside-stat').textContent=unavailable?'—':all.filter(f=>f.properties.inside).length;
-  $('high-stat').textContent=unavailable?'—':all.filter(f=>f.properties.confidence==='high').length;
-  $('latest-stat').textContent=all.length?dateText(all[0].properties.detected_at):'Tidak ada deteksi';
+  $('inside-stat').textContent=unavailable?'—':inside.length;
+  $('high-stat').textContent=unavailable?'—':inside.filter(f=>f.properties.confidence==='high').length;
+  $('latest-stat').textContent=visible.length?dateText(visible[0].properties.detected_at):'Tidak ada deteksi';
   if(unavailable) $('latest-stat').textContent='Belum tersedia';
-  $('map-count').textContent=`${visible.length} hotspot dalam AOI`;
-  $('table-summary').textContent=unavailable?'Data hotspot belum tersedia':`${visible.length} deteksi · ${$('period').selectedOptions[0].text} · waktu WITA (UTC+8)`;
+  $('map-count').textContent=`${visible.length} hotspot · ${inside.length} di dalam KHDTK`;
+  $('table-summary').textContent=unavailable?'Data hotspot belum tersedia':`${visible.length} deteksi · hingga 25 km dari batas KHDTK · ${$('period').selectedOptions[0].text} · WITA (UTC+8)`;
   $('export').disabled=!visible.length;$('fit-hotspots').disabled=!visible.length;
   $('empty').hidden=visible.length>0;
   $('empty-title').textContent=unavailable?'Data hotspot belum tersedia':'Tidak ada hotspot pada filter ini';
-  $('empty-text').textContent=unavailable?'Periksa status sumber data. Kegagalan pengambilan data tidak berarti tidak ada hotspot.':status.state==='ready'?'Tidak ditemukan deteksi di dalam batas SHP pada periode pilihan. Anda dapat memeriksa periode 7 hari.':'Cakupan sumber belum lengkap. Tidak adanya baris pada filter ini belum mewakili seluruh pengamatan.';
+  $('empty-text').textContent=unavailable?'Periksa status sumber data. Kegagalan pengambilan data tidak berarti tidak ada hotspot.':status.state==='ready'?'Tidak ditemukan deteksi di dalam atau hingga 25 km dari batas KHDTK pada filter ini. Anda dapat memeriksa periode 7 hari.':'Cakupan sumber belum lengkap. Tidak adanya baris pada filter ini belum mewakili seluruh pengamatan.';
   markerById.clear();hotspotLayer.clearLayers();
   for(const feature of visible) {
     const p=feature.properties,[lon,lat]=feature.geometry.coordinates;
-    const marker=L.circleMarker([lat,lon],{radius:p.confidence==='high'?7:6,color:'#fff',weight:1.5,fillColor:colors[p.confidence],fillOpacity:p.stale?.55:.88});
+    const marker=L.marker([lat,lon],{icon:fireIcon(L,p.confidence),opacity:p.stale?.55:1,title:`Hotspot ${p.satellite || ''} · ${labels[p.confidence]}`});
     const place=p.inside?'Di dalam KHDTK':`${number(p.distance_km)} km dari batas`;
     marker.bindPopup(`<span class="popup-label">HOTSPOT ${escapeHTML(p.instrument)}</span><br><strong>${escapeHTML(p.satellite)}</strong><br>${dateText(p.detected_at)} WITA<br>${place}<br>Kepercayaan: ${labels[p.confidence]}<br>FRP: ${Number.isFinite(p.frp)?number(p.frp)+' MW':'Tidak tersedia'}<br>${lat.toFixed(5)}, ${lon.toFixed(5)}${p.stale?'<br><strong>Data tersimpan · sumber gagal diperbarui</strong>':''}`);
     marker.bindTooltip(`${escapeHTML(p.satellite)} · ${labels[p.confidence]} · ${place}`);
@@ -176,12 +176,12 @@ async function start() {
     $('boundary-description').textContent=`AOI utama berasal dari AOI KRUS.shp, dengan luas geodesik ${number(info.areaHa)} ha. Proyeksi DGN95 / UTM Zona 50S (EPSG:23880) dikonversi ke WGS 84. Garis merah menandai batas SHP pada peta yang dapat dijelajahi bebas; KML tetap tersimpan sebagai data pembanding.`;
     setupMap();
     ['period','confidence'].forEach(id=>$(id).addEventListener('change',()=>{pageSize=50;render();}));
-    $('reset').addEventListener('click',()=>{$('period').value='168';$('scope').value='inside';$('confidence').value='all';pageSize=50;render();});
+    $('reset').addEventListener('click',()=>{$('period').value='168';$('confidence').value='all';pageSize=50;render();});
     $('more').addEventListener('click',()=>{pageSize+=50;renderRows();});
     $('refresh').addEventListener('click',loadHotspots);
     $('export').addEventListener('click',()=>{
       const url=URL.createObjectURL(new Blob([toCSV(visible)],{type:'text/csv;charset=utf-8'}));
-      const a=document.createElement('a');a.href=url;a.download='hotspot-khdtk-lempake.csv';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
+      const a=document.createElement('a');a.href=url;a.download='hotspot-khdtk-dan-sekitar.csv';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
     });
     await loadHotspots();
     // Keep elapsed-time filters and freshness accurate in long-lived monitoring tabs.

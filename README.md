@@ -9,8 +9,8 @@ WebGIS **KHDTK Diklathut Fahutan Unmul Lempake** dengan batas dari berkas penggu
 ## Fitur
 
 - Header merah dan peta interaktif Leaflet, peta jalan OpenStreetMap serta citra Esri World Imagery sebagai tampilan awal.
-- Peta dapat dijelajahi bebas dengan garis batas merah SHP, tanpa penutup citra di luar kawasan atau pembatasan pergeseran/zoom. Tombol Lihat batas mengembalikan kawasan ke layar.
-- NASA FIRMS VIIRS S-NPP, NOAA-20 dan NOAA-21, maksimum 7 hari berjalan. Peta, ringkasan, dan tabel menampilkan deteksi **di dalam AOI KHDTK saja**.
+- Peta dapat dijelajahi bebas dengan garis batas merah SHP, tanpa penutup citra di luar kawasan atau pembatasan pergeseran/zoom. Tampilan awal menunjukkan wilayah sekitar KHDTK dan tidak memiliki tombol fokus AOI.
+- NASA FIRMS VIIRS S-NPP, NOAA-20 dan NOAA-21, maksimum 7 hari berjalan. Peta dan tabel menampilkan deteksi **di dalam dan hingga 25 km dari batas KHDTK** menggunakan ikon api. Statistik kawasan tetap menghitung titik di dalam SHP; deteksi terbaru mencakup kawasan dan sekitarnya.
 - Filter 24/48 jam/7 hari dan kepercayaan deteksi.
 - Popup, tabel, jarak batas, waktu WITA, FRP dalam MW, ekspor CSV dan unduh GeoJSON.
 - Sumber yang gagal dibedakan dari sumber yang berhasil tanpa deteksi. Catatan lama yang masih relevan dipertahankan dan ditandai.
@@ -33,7 +33,7 @@ python scripts/convert-boundary.py --help
 
 ## Data hotspot dan pembaruan
 
-Updater memakai [unduhan publik NASA FIRMS](https://firms.modaps.eosdis.nasa.gov/active_fire/) dari [katalog resmi](https://firms.modaps.eosdis.nasa.gov/api/active_fire_files/all?format=json), tanpa MAP_KEY atau rahasia di frontend. Feed CSV Asia Tenggara memuat VIIRS Collection 2 Near Real-Time. Snapshot menyimpan titik hingga 25 km dari SHP untuk konteks data, sedangkan antarmuka hanya menampilkan titik di dalam poligon. Titik disaring dengan jarak sferis terpendek ke poligon SHP (radius bumi 6371,0088 km), deduplikasi sensor/waktu/koordinat, dan waktu UTC.
+Updater memakai [unduhan publik NASA FIRMS](https://firms.modaps.eosdis.nasa.gov/active_fire/) dari [katalog resmi](https://firms.modaps.eosdis.nasa.gov/api/active_fire_files/all?format=json), tanpa MAP_KEY atau rahasia di frontend. Feed CSV Asia Tenggara memuat VIIRS Collection 2 Near Real-Time. Snapshot menyimpan titik hingga 25 km dari SHP untuk konteks data, dan antarmuka menampilkan seluruh titik tersebut, dengan lokasi di dalam kawasan atau jarak dari batas pada setiap popup/baris. Titik disaring dengan jarak sferis terpendek ke poligon SHP (radius bumi 6371,0088 km), deduplikasi sensor/waktu/koordinat, dan waktu UTC.
 
 ```powershell
 python scripts/update-hotspots.py
