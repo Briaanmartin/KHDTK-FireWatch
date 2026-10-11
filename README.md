@@ -12,6 +12,8 @@ WebGIS **KHDTK Diklathut Fahutan Unmul Lempake** dengan batas dari berkas penggu
 - Peta dapat dijelajahi bebas dengan garis batas merah SHP, tanpa penutup citra di luar kawasan atau pembatasan pergeseran/zoom. Tampilan awal menunjukkan wilayah sekitar KHDTK dan tidak memiliki tombol fokus AOI.
 - NASA FIRMS VIIRS S-NPP, NOAA-20 dan NOAA-21, maksimum 7 hari berjalan. Peta dan tabel menampilkan deteksi **di dalam dan hingga 25 km dari batas KHDTK** menggunakan ikon api. Statistik kawasan tetap menghitung titik di dalam SHP; deteksi terbaru mencakup kawasan dan sekitarnya.
 - Filter 24/48 jam/7 hari dan kepercayaan deteksi.
+- Indikator **Pantau · Waspada · Siaga** dari seluruh deteksi 24 jam terakhir, terpisah dari filter peta: Pantau bila belum ada deteksi, Waspada bila ada deteksi sekitar hingga 25 km, dan Siaga bila ada deteksi dalam KHDTK. Ini kategori pengamatan versi situs, bukan peringatan resmi atau indeks cuaca kebakaran. Data yang gagal, tidak lengkap, atau lebih dari 6 jam menampilkan kategori belum dapat dinilai sambil mempertahankan catatan tersedia.
+- Catatan deteksi menampilkan lima baris terbaru; daftar lengkap dapat dibuka dan diringkas kembali. Koordinat serta FRP tetap tersedia pada popup dan ekspor CSV.
 - Popup, tabel, jarak batas, waktu WITA, FRP dalam MW, ekspor CSV dan unduh GeoJSON.
 - Sumber yang gagal dibedakan dari sumber yang berhasil tanpa deteksi. Catatan lama yang masih relevan dipertahankan dan ditandai.
 - Bagian foto laporan lapangan: foto, waktu WITA, titik lokasi yang dipilih pada peta, catatan, galeri perangkat, dan unduh laporan HTML beserta foto dan koordinat.
@@ -75,7 +77,7 @@ Catatan sumber publik tahun 2026 berasal dari [SRUK](https://srukindonesia.kemen
 
 ## Foto laporan lapangan
 
-Laporan **publik** disimpan online melalui [Laporan Lapangan FireWatch](https://khdtk-firewatch-laporan.brianmartin.chatgpt.site). WebGIS GitHub Pages membaca feed yang sama sehingga foto, catatan, waktu WITA, dan titik laporan dapat dilihat semua pengunjung/perangkat. Klik **Kirim laporan online**, masuk dengan ChatGPT, pilih foto dan titik pada peta, lalu pilih **Publikasikan laporan**. Membaca laporan tidak memerlukan akun.
+Laporan **publik** disimpan online melalui [Laporan Lapangan FireWatch](https://khdtk-firewatch-laporan.brianmartin.chatgpt.site). WebGIS GitHub Pages membaca feed yang sama sehingga foto, catatan, waktu WITA, dan titik laporan dapat dilihat semua pengunjung/perangkat. Klik **Kirim laporan online**, lalu **Masuk / daftar**. Untuk akun Gmail, pilih **Lanjutkan dengan Google** pada halaman masuk ChatGPT. Pilih foto dan titik pada peta, isi catatan singkat, lalu pilih **Publikasikan laporan**. Membaca laporan tidak memerlukan akun.
 
 Laporan merupakan pengamatan pengguna yang belum diverifikasi, bukan otomatis kejadian kebakaran terkonfirmasi. Formulir menjelaskan bahwa foto, catatan, dan koordinat akan menjadi publik. Email dan identitas akun tidak ditampilkan pada feed publik. Hanya pengirim yang dapat mengarsipkan atau memulihkan laporan miliknya; pengarsipan menyembunyikannya dari pengunjung dan dapat dibatalkan.
 

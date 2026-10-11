@@ -32,7 +32,7 @@ jobs:
       - name: Prepare public files
         run: |
           mkdir public
-          cp index.html style.css reports.css history.css app.mjs core.mjs hotspot-icon.mjs reports.mjs report-state.mjs history.mjs .nojekyll public/
+          cp index.html style.css reports.css history.css fire-alert.css app.mjs core.mjs hotspot-icon.mjs fire-alert.mjs reports.mjs report-state.mjs history.mjs .nojekyll public/
           cp -r data vendor public/
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v4

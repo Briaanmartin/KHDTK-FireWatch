@@ -5,7 +5,7 @@
   <meta name="theme-color" content="#b32624">
   <meta name="description" content="WebGIS batas KHDTK Diklathut Fahutan Unmul Lempake dan pemantauan hotspot satelit NASA FIRMS.">
   <title>KHDTK Diklathut Fahutan Unmul Lempake · FireWatch</title>
-  <link rel="stylesheet" href="vendor/leaflet/leaflet.css"><link rel="stylesheet" href="style.css?v=20261012-public-reports"><link rel="stylesheet" href="reports.css?v=20261012-public-reports"><link rel="stylesheet" href="history.css?v=20261012-public-reports">
+  <link rel="stylesheet" href="vendor/leaflet/leaflet.css"><link rel="stylesheet" href="style.css?v=20261012-siaga"><link rel="stylesheet" href="reports.css?v=20261012-siaga"><link rel="stylesheet" href="history.css?v=20261012-siaga"><link rel="stylesheet" href="fire-alert.css?v=20261012-siaga">
 </head>
 <body>
   <a class="skip" href="#map-section">Langsung ke peta</a>
@@ -21,6 +21,7 @@
       <div class="update-box"><span id="status-badge" class="badge">Memuat data…</span><p id="checked-at">Memeriksa pembaruan NASA FIRMS</p><button id="refresh" class="text-button">↻ Muat ulang data</button></div>
     </section>
     <div id="system-notice" class="system-notice" role="status" aria-live="polite">Memuat batas kawasan dan data hotspot…</div>
+    <section id="fire-alert" class="panel" aria-label="Siaga pemantauan api"><h2>Siaga pemantauan api</h2><p>Memuat indikator deteksi 24 jam terakhir…</p></section>
     <section class="stats" aria-label="Ringkasan pemantauan">
       <article><span>LUAS POLIGON SHP</span><strong id="area-stat">—</strong><small>Hektare · perhitungan geodesik</small></article>
       <article><span>HOTSPOT DALAM KHDTK</span><strong id="inside-stat">—</strong><small>Sesuai periode & kepercayaan</small></article>
@@ -57,11 +58,12 @@
       </div>
     </section>
     <section id="detections" class="panel">
-      <div class="panel-head"><div><p class="eyebrow">CATATAN DETEKSI</p><h2>Hotspot KHDTK &amp; sekitarnya</h2><p id="table-summary">Memuat data…</p></div><button id="export" disabled>↓ Unduh CSV</button></div>
-      <div class="table-wrap"><table><thead><tr><th>WAKTU (WITA)</th><th>SATELIT</th><th>LOKASI</th><th>KEPERCAYAAN</th><th>FRP (MW)</th><th>KOORDINAT</th><th>PETA</th></tr></thead><tbody id="rows"></tbody></table></div>
+      <div class="panel-head"><div><p class="eyebrow">CATATAN DETEKSI</p><h2>Ringkasan hotspot</h2><p id="table-summary">Memuat data…</p></div><button id="export" disabled>↓ Unduh CSV</button></div>
+      <div class="table-wrap"><table><thead><tr><th>WAKTU (WITA)</th><th>SATELIT</th><th>LOKASI</th><th>KEPERCAYAAN</th><th>PETA</th></tr></thead><tbody id="rows"></tbody></table></div>
       <div id="empty" class="empty" hidden><span>◎</span><h3 id="empty-title">Tidak ada hotspot pada filter ini</h3><p id="empty-text">Ubah periode atau lokasi untuk melihat deteksi lainnya.</p></div>
-      <button id="more" class="secondary" hidden>Tampilkan lebih banyak</button>
-      <p class="micro">Setiap baris adalah deteksi satelit, bukan jumlah kejadian kebakaran. Satu kejadian dapat terdeteksi lebih dari sekali.</p>
+      <p id="detection-view-note" class="micro">5 deteksi terbaru. Detail lengkap tersedia pada peta atau CSV.</p>
+      <button id="more" class="secondary" aria-controls="rows" aria-expanded="false" hidden>Lihat semua deteksi</button>
+      <p class="micro">Hotspot adalah indikasi panas satelit dan perlu verifikasi lapangan.</p>
     </section>
     <section id="history" class="panel" aria-label="Riwayat api dan hotspot tahunan"><h2>Riwayat api &amp; hotspot</h2><p>Memuat arsip tahunan dalam AOI KHDTK…</p></section>
     <section id="fire-context" class="panel" aria-labelledby="fire-context-title">
@@ -81,5 +83,5 @@
   </main>
   <footer><span>◈ <strong>FireWatch</strong> · KHDTK Lempake</span><a href="https://briaanmartin.github.io/profile.github.io/">Profil Brian Martin ↗</a><a href="https://github.com/briaanmartin/KHDTK-FireWatch">Kode & dokumentasi ↗</a></footer>
   <noscript><p class="system-notice">Aktifkan JavaScript untuk menggunakan peta interaktif dan filter hotspot.</p></noscript>
-  <script src="vendor/leaflet/leaflet.js"></script><script type="module" src="app.mjs?v=20261012-public-reports"></script><script type="module" src="reports.mjs?v=20261012-public-reports"></script><script type="module" src="history.mjs?v=20261012-public-reports"></script>
+  <script src="vendor/leaflet/leaflet.js"></script><script type="module" src="app.mjs?v=20261012-siaga"></script><script type="module" src="reports.mjs?v=20261012-siaga"></script><script type="module" src="history.mjs?v=20261012-siaga"></script>
 </body></html>

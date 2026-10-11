@@ -1,5 +1,6 @@
 import {insideBoundary, distanceToBoundaryKm, normalizeConfidence, filterDetections, toCSV} from './core.mjs';
 import {fireIcon, FIRE_SVG} from './hotspot-icon.mjs';
+import {mountFireAlert} from './fire-alert.mjs?v=20261012-siaga';
 import {subscribeReports, subscribeReportStatus} from './report-state.mjs?v=20261012-public-reports';
 
 const $ = id => document.getElementById(id);
@@ -10,7 +11,9 @@ const number = value => new Intl.NumberFormat('id-ID',{maximumFractionDigits:2})
 const dateText = value => value && Number.isFinite(Date.parse(value)) ? dateFormat.format(new Date(value)) : 'Belum tersedia';
 const escapeHTML = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 let map, boundary, info, boundaryLayer, hotspotLayer, reportLayer, currentBase, historyMarker;
-let detections = [], visible = [], status, dataLoaded = false, pageSize = 50, loading = false;
+const SHORT_DETECTION_LIMIT = 5;
+const fireAlert = mountFireAlert($('fire-alert'));
+let detections = [], visible = [], status, dataLoaded = false, pageSize = SHORT_DETECTION_LIMIT, loading = false, hotspotLoadError = false;
 const markerById = new Map();
 const reportMarkers = new Map(), reportPhotoURLs = new Set();
 let reportCounts={public:0,local:0,withoutPoint:0}, reportStatus={state:'loading',hasLoaded:false};
@@ -131,10 +134,12 @@ function prepareDetections(collection) {
   }).filter(f=>f.properties.distance_km<=25).sort((a,b)=>Date.parse(b.properties.detected_at)-Date.parse(a.properties.detected_at));
 }
 function renderStatus() {
+  fireAlert({features:detections,status,loadError:hotspotLoadError});
   const checked = Date.parse(status?.checked_at), age = Date.now() - checked;
   const stale = !Number.isFinite(checked) || age > 6*3600000;
   let label='Data NASA FIRMS', tone='', message='Garis merah menunjukkan batas KHDTK. Ikon api menandai hotspot di dalam dan sekitar kawasan hingga 25 km dari batas. Peta dapat dijelajahi bebas; pengamatan NASA FIRMS diperbarui setiap jam.';
-  if (status?.state==='error') { label='Sumber belum tersedia';tone='error';message='Pengambilan data hotspot gagal. Jika tersedia, catatan terakhir tetap ditampilkan dengan status data lama. Kondisi kawasan belum dapat disimpulkan dari data ini.'; }
+  if (hotspotLoadError) { label='Gagal memuat data';tone='error';message='Pembaruan hotspot gagal. Catatan terakhir tetap tersedia; muat ulang untuk menilai kategori pemantauan.'; }
+  else if (status?.state==='error') { label='Sumber belum tersedia';tone='error';message='Pengambilan data hotspot gagal. Jika tersedia, catatan terakhir tetap ditampilkan dengan status data lama. Kondisi kawasan belum dapat disimpulkan dari data ini.'; }
   else if (status?.state==='partial') { label='Sebagian sumber tersedia';tone='warn';message='Sebagian sumber NASA FIRMS gagal diperbarui. Catatan tersimpan dari sumber tersebut ditandai sebagai data lama; cakupan pengamatan belum lengkap.'; }
   else if (stale) { label='Data perlu diperbarui';tone='warn';message='Pembaruan data terakhir sudah lebih dari 6 jam atau waktunya tidak tersedia. Tabel tetap menampilkan catatan dalam periode pilihan; periksa waktu pengamatan.'; }
   $('status-badge').textContent=label;$('status-badge').className=`badge ${tone}`;
@@ -161,7 +166,7 @@ function render() {
   $('latest-stat').textContent=visible.length?dateText(visible[0].properties.detected_at):'Tidak ada deteksi';
   if(unavailable) $('latest-stat').textContent='Belum tersedia';
   $('map-count').textContent=`${visible.length} hotspot · ${inside.length} di dalam KHDTK`;
-  $('table-summary').textContent=unavailable?'Data hotspot belum tersedia':`${visible.length} deteksi · hingga 25 km dari batas KHDTK · ${$('period').selectedOptions[0].text} · WITA (UTC+8)`;
+  $('table-summary').textContent=unavailable?'Data hotspot belum tersedia':`${visible.length} deteksi · ${$('period').selectedOptions[0].text} · hingga 25 km dari batas`;
   $('export').disabled=!visible.length;$('fit-hotspots').disabled=!visible.length;
   $('empty').hidden=visible.length>0;
   $('empty-title').textContent=unavailable?'Data hotspot belum tersedia':'Tidak ada hotspot pada filter ini';
@@ -181,7 +186,7 @@ function renderRows() {
   $('rows').replaceChildren();
   for(const feature of visible.slice(0,pageSize)) {
     const p=feature.properties,[lon,lat]=feature.geometry.coordinates,tr=document.createElement('tr');
-    const values=[dateText(p.detected_at),p.satellite+(p.stale?' · data lama':''),p.inside?'Dalam KHDTK':`${number(p.distance_km)} km dari batas`,labels[p.confidence],Number.isFinite(p.frp)?number(p.frp):'—',`${lat.toFixed(5)}, ${lon.toFixed(5)}`];
+    const values=[dateText(p.detected_at),p.satellite+(p.stale?' · data lama':''),p.inside?'Dalam KHDTK':`${number(p.distance_km)} km dari batas`,labels[p.confidence]];
     for(const [index,value] of values.entries()) {
       const td=document.createElement('td');
       if(index===2){const span=document.createElement('span');span.className=`pill ${p.inside?'':'near'}`;span.textContent=value;td.append(span);}
@@ -193,7 +198,10 @@ function renderRows() {
     button.addEventListener('click',()=>{$('show-hotspots').checked=true;hotspotLayer.addTo(map);map.setView([lat,lon],15);markerById.get(p.id)?.openPopup();$('map').scrollIntoView({behavior:'smooth',block:'center'});});
     td.append(button);tr.append(td);$('rows').append(tr);
   }
-  $('more').hidden=pageSize>=visible.length;
+  $('more').hidden=visible.length<=SHORT_DETECTION_LIMIT;
+  $('more').textContent=pageSize===SHORT_DETECTION_LIMIT?`Lihat semua ${visible.length} deteksi`:'Ringkas kembali';
+  $('more').setAttribute('aria-expanded',String(pageSize>SHORT_DETECTION_LIMIT));
+  $('detection-view-note').textContent=visible.length>SHORT_DETECTION_LIMIT && pageSize===SHORT_DETECTION_LIMIT?'5 deteksi terbaru. Detail lengkap tersedia pada peta atau CSV.':'Detail deteksi tersedia pada peta atau CSV.';
 }
 async function loadHotspots() {
   if(loading) return;
@@ -202,9 +210,10 @@ async function loadHotspots() {
     const collection=await json('data/hotspots.geojson'), newStatus=collection.status;
     if(!newStatus || collection.generated_at!==newStatus.checked_at) throw new Error('Snapshot hotspot dan status tidak cocok.');
     if(!['ready','partial','error'].includes(newStatus.state)) throw new Error('Status sumber tidak valid.');
-    detections=prepareDetections(collection);status=newStatus;dataLoaded=true;
-    pageSize=50;renderStatus();render();
+    detections=prepareDetections(collection);status=newStatus;dataLoaded=true;hotspotLoadError=false;
+    pageSize=SHORT_DETECTION_LIMIT;renderStatus();render();
   } catch(error) {
+    hotspotLoadError=true;fireAlert({features:dataLoaded?detections:undefined,status,loadError:true});
     notice(`Data hotspot gagal dimuat. ${dataLoaded?'Data yang sudah dimuat tetap tersedia. ':''}Coba muat ulang data.`, 'error');
     $('status-badge').textContent='Gagal memuat data';$('status-badge').className='badge error';
     if(!dataLoaded){$('table-summary').textContent='Data hotspot belum tersedia';$('empty').hidden=false;$('empty-title').textContent='Data hotspot belum tersedia';$('empty-text').textContent='Periksa koneksi lalu muat ulang data.';$('map-count').textContent='Lapisan hotspot belum tersedia';}
@@ -217,9 +226,9 @@ async function start() {
     $('area-stat').textContent=number(info.areaHa);
     $('boundary-description').textContent=`AOI utama berasal dari AOI KRUS.shp, dengan luas geodesik ${number(info.areaHa)} ha. Proyeksi DGN95 / UTM Zona 50S (EPSG:23880) dikonversi ke WGS 84. Garis merah menandai batas SHP pada peta yang dapat dijelajahi bebas; KML tetap tersimpan sebagai data pembanding.`;
     setupMap();
-    ['period','confidence'].forEach(id=>$(id).addEventListener('change',()=>{pageSize=50;render();}));
-    $('reset').addEventListener('click',()=>{$('period').value='168';$('confidence').value='all';pageSize=50;render();});
-    $('more').addEventListener('click',()=>{pageSize+=50;renderRows();});
+    ['period','confidence'].forEach(id=>$(id).addEventListener('change',()=>{pageSize=SHORT_DETECTION_LIMIT;render();}));
+    $('reset').addEventListener('click',()=>{$('period').value='168';$('confidence').value='all';pageSize=SHORT_DETECTION_LIMIT;render();});
+    $('more').addEventListener('click',()=>{pageSize=pageSize===SHORT_DETECTION_LIMIT?visible.length:SHORT_DETECTION_LIMIT;renderRows();});
     $('refresh').addEventListener('click',loadHotspots);
     $('export').addEventListener('click',()=>{
       const url=URL.createObjectURL(new Blob([toCSV(visible)],{type:'text/csv;charset=utf-8'}));
@@ -231,6 +240,7 @@ async function start() {
     setInterval(()=>{if(!document.hidden) loadHotspots();},300000);
     document.addEventListener('visibilitychange',()=>{if(!document.hidden) loadHotspots();});
   } catch(error) {
+    fireAlert({loadError:true});
     notice('Batas kawasan atau pustaka peta gagal dimuat. Periksa koneksi lalu muat ulang halaman.','error');
     $('status-badge').textContent='Peta belum tersedia';$('refresh').textContent='↻ Muat ulang halaman';$('refresh').onclick=()=>location.reload();
     console.error(error);
