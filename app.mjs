@@ -1,5 +1,6 @@
 import {insideBoundary, distanceToBoundaryKm, normalizeConfidence, filterDetections, toCSV} from './core.mjs';
 import {fireIcon, FIRE_SVG} from './hotspot-icon.mjs';
+import {subscribeReports} from './report-state.mjs';
 
 const $ = id => document.getElementById(id);
 const NAME = 'KHDTK Diklathut Fahutan Unmul Lempake';
@@ -8,9 +9,36 @@ const dateFormat = new Intl.DateTimeFormat('id-ID', {timeZone:'Asia/Makassar',da
 const number = value => new Intl.NumberFormat('id-ID',{maximumFractionDigits:2}).format(value);
 const dateText = value => value && Number.isFinite(Date.parse(value)) ? dateFormat.format(new Date(value)) : 'Belum tersedia';
 const escapeHTML = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-let map, boundary, info, boundaryLayer, hotspotLayer, currentBase, historyMarker, reportMarker;
+let map, boundary, info, boundaryLayer, hotspotLayer, reportLayer, currentBase, historyMarker;
 let detections = [], visible = [], status, dataLoaded = false, pageSize = 50, loading = false;
 const markerById = new Map();
+const reportMarkers = new Map(), reportPhotoURLs = new Set();
+const REPORT_ICON = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 30 38" aria-hidden="true"><path d="M15 1C7.6 1 2 6.5 2 13.5 2 23 15 36 15 36s13-13 13-22.5C28 6.5 22.4 1 15 1Z" fill="#176b82" stroke="white" stroke-width="2"/><path d="M8 10h3l1-2h6l1 2h3v11H8Z" fill="none" stroke="white" stroke-width="1.7" stroke-linejoin="round"/><circle cx="15" cy="15.5" r="3.2" fill="none" stroke="white" stroke-width="1.7"/></svg>';
+
+function renderReportLayer(reports) {
+  reportLayer.clearLayers();reportMarkers.clear();
+  reportPhotoURLs.forEach(url=>URL.revokeObjectURL(url));reportPhotoURLs.clear();
+  let withoutPoint=0;
+  for(const report of reports) {
+    const lat=report?.latitude,lon=report?.longitude;
+    if(!report?.id || !Number.isFinite(lat)||!Number.isFinite(lon)||Math.abs(lat)>90||Math.abs(lon)>180){withoutPoint++;continue;}
+    const title=String(report.title || 'Laporan lapangan');
+    const marker=L.marker([lat,lon],{title:`Laporan: ${title}`,zIndexOffset:700,icon:L.divIcon({className:'field-report-marker',html:REPORT_ICON,iconSize:[30,38],iconAnchor:[15,36],popupAnchor:[0,-31]})});
+    const place=insideBoundary([lon,lat],boundary)?'Di dalam batas KHDTK':'Di luar batas KHDTK';
+    const popup=document.createElement('div');popup.className='report-map-popup';
+    popup.innerHTML=`<span class="popup-label">LAPORAN LAPANGAN</span><br><strong>${escapeHTML(title)}</strong><br>${dateText(`${report.observedAt}:00+08:00`)} WITA<br>${place}<br>${lat.toFixed(6)}, ${lon.toFixed(6)}`;
+    if(report.photo instanceof Blob && ['image/jpeg','image/png','image/webp'].includes(report.photo.type)) {
+      const img=document.createElement('img'),url=URL.createObjectURL(report.photo);reportPhotoURLs.add(url);
+      img.src=url;img.alt=`Foto laporan: ${title}`;img.className='report-map-photo';popup.append(img);
+    }
+    if(report.notes){const notes=document.createElement('p');notes.className='report-map-notes';notes.textContent=report.notes;popup.append(notes);}
+    const caption=document.createElement('small');caption.textContent='Laporan pengguna · tersimpan di perangkat ini.';popup.append(caption);
+    marker.bindPopup(popup,{maxWidth:270});marker.bindTooltip(escapeHTML(title));
+    marker.addTo(reportLayer);reportMarkers.set(report.id,marker);
+  }
+  $('report-map-count').textContent=`${reportMarkers.size} titik laporan · perangkat ini${withoutPoint?` · ${withoutPoint} tanpa koordinat`:''}`;
+  $('fit-reports').disabled=!reportMarkers.size;
+}
 
 async function json(path) {
   const response = await fetch(path, {cache:'no-cache',signal:AbortSignal.timeout(20000)});
@@ -42,8 +70,11 @@ function setupMap() {
   boundaryLayer.bindTooltip('Batas KHDTK Lempake');
   const areaBounds=boundaryLayer.getBounds();
   hotspotLayer = L.featureGroup().addTo(map);
+  reportLayer = L.featureGroup().addTo(map);
   const toggle = (id,layer) => $(id).addEventListener('change',()=>$(id).checked ? layer.addTo(map) : map.removeLayer(layer));
-  toggle('show-boundary',boundaryLayer);toggle('show-hotspots',hotspotLayer);
+  toggle('show-boundary',boundaryLayer);toggle('show-hotspots',hotspotLayer);toggle('show-reports',reportLayer);
+  subscribeReports(renderReportLayer);
+  window.addEventListener('pagehide',event=>{if(!event.persisted){reportPhotoURLs.forEach(url=>URL.revokeObjectURL(url));reportPhotoURLs.clear();}});
   document.querySelectorAll('[data-fire-icon]').forEach(element=>{element.innerHTML=FIRE_SVG;});
   document.addEventListener('history:show', event=>{
     const feature=event.detail?.feature;
@@ -58,15 +89,15 @@ function setupMap() {
   });
   document.addEventListener('report:show', event=>{
     const report=event.detail?.report;
-    const lat=report?.latitude,lon=report?.longitude;
-    if(!Number.isFinite(lat)||!Number.isFinite(lon)||Math.abs(lat)>90||Math.abs(lon)>180) return;
-    if(reportMarker) map.removeLayer(reportMarker);
-    const marker=L.marker([lat,lon],{title:'Titik laporan lapangan',icon:L.divIcon({className:'report-point-marker',html:'<span></span>',iconSize:[24,24],iconAnchor:[12,12]})}).addTo(map);
-    reportMarker=marker;
-    const place=insideBoundary([lon,lat],boundary)?'Di dalam batas KHDTK':'Di luar batas KHDTK';
-    marker.bindPopup(`<span class="popup-label">TITIK LAPORAN LAPANGAN</span><br><strong>${escapeHTML(report.title)}</strong><br>${dateText(`${report.observedAt}:00+08:00`)} WITA<br>${place}<br>${lat.toFixed(6)}, ${lon.toFixed(6)}<br><small>Lokasi dipilih pelapor · tersimpan di perangkat ini.</small>`);
-    marker.on('popupclose',()=>{map.removeLayer(marker);if(reportMarker===marker) reportMarker=null;});
-    map.setView([lat,lon],16);marker.openPopup();$('map').scrollIntoView({behavior:'smooth',block:'center'});
+    const marker=reportMarkers.get(report?.id);
+    if(!marker) return;
+    $('show-reports').checked=true;reportLayer.addTo(map);
+    map.setView(marker.getLatLng(),16);marker.openPopup();$('map').scrollIntoView({behavior:'smooth',block:'center'});
+  });
+  $('fit-reports').addEventListener('click',()=>{
+    if(!reportMarkers.size) return;
+    $('show-reports').checked=true;reportLayer.addTo(map);
+    map.fitBounds(reportLayer.getBounds(),{padding:[45,45],maxZoom:16});
   });
   $('fit-hotspots').addEventListener('click',()=>{
     if (!hotspotLayer.getLayers().length) return;

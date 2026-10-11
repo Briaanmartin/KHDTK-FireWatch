@@ -1,4 +1,5 @@
 import { insideBoundary } from './core.mjs';
+import { publishReports } from './report-state.mjs';
 
 const MAX_BYTES = 10 * 1024 * 1024;
 const IMAGE_TYPES = new Set(['image/jpeg', 'image/png', 'image/webp']);
@@ -102,7 +103,7 @@ async function mountReports(root) {
   const $ = selector => root.querySelector(selector);
   const form = $('#report-form'), fields = $('#report-fields'), save = $('#report-save'), list = $('#reports-list');
   const preview = $('#report-preview'), previewWrap = $('#report-preview-wrap'), status = $('#report-status');
-  let database, reports = [], photo, previewURL, selection = 0, decoding = false, busy = false;
+  let database, reports = [], reportsLoaded = false, photo, previewURL, selection = 0, decoding = false, busy = false;
   let point = null, picker, pointMarker, pickerBoundary, boundaryLayer, mapResize;
   const cardURLs = new Set(), downloadURLs = new Set();
   const feedback = (message, error = false) => { status.textContent = message; status.classList.toggle('is-error', error); };
@@ -226,6 +227,7 @@ async function mountReports(root) {
     if (text !== undefined) element.textContent = text; return element;
   }
   function renderReports() {
+    if (reportsLoaded) publishReports(reports);
     cardURLs.forEach(url => URL.revokeObjectURL(url)); cardURLs.clear(); list.replaceChildren();
     $('#reports-count').textContent = `${reports.length} laporan`;
     if (!reports.length) {
@@ -282,6 +284,7 @@ async function mountReports(root) {
     database = await openDatabase();
     database.onversionchange = () => { database.close(); database = undefined; updateSave(); feedback('Penyimpanan berubah. Muat ulang halaman sebelum menyimpan laporan baru.', true); };
     reports = (await transaction(database, 'readonly', store => store.getAll())).sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+    reportsLoaded = true;
     renderReports(); updateSave(); feedback('Penyimpanan perangkat siap. Laporan Anda tidak otomatis dikirim ke tim.');
   } catch (error) { database?.close(); database = undefined; updateSave(); feedback(`Penyimpanan perangkat tidak tersedia. ${error.message || 'Periksa pengaturan browser lalu muat ulang.'} Foto dan isian belum disimpan.`, true); }
   window.addEventListener('pagehide', event => { if (event.persisted) return; if (previewURL) URL.revokeObjectURL(previewURL); cardURLs.forEach(url => URL.revokeObjectURL(url)); downloadURLs.forEach(url => URL.revokeObjectURL(url)); database?.close(); mapResize?.disconnect(); picker?.remove(); });

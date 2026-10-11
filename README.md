@@ -79,7 +79,7 @@ Foto JPEG, PNG, atau WebP (maksimum 10 MB) dan catatan disimpan menggunakan Inde
 
 Galeri awal kosong. Tidak ada foto lapangan buatan atau foto contoh yang disajikan sebagai laporan nyata.
 
-Lokasi laporan baru dipilih dengan klik/ketuk pada peta, lalu dapat dikoreksi dengan menggeser penanda. Pengguna keyboard dapat menggeser peta memakai tombol panah dan memilih **Gunakan tengah peta**. Koordinat WGS 84 dan status di dalam/di luar batas SHP disimpan bersama laporan serta disertakan dalam unduhan. Tombol **Lihat titik di peta** pada laporan tersimpan membuka lokasi tersebut di peta utama. Laporan lama yang hanya berisi teks lokasi tetap dapat dibaca dan diekspor.
+Lokasi laporan baru dipilih dengan klik/ketuk pada peta, lalu dapat dikoreksi dengan menggeser penanda. Pengguna keyboard dapat menggeser peta memakai tombol panah dan memilih **Gunakan tengah peta**. Koordinat WGS 84 dan status di dalam/di luar batas SHP disimpan bersama laporan serta disertakan dalam unduhan. Semua laporan berkoordinat otomatis tampil sebagai pin kamera biru pada lapisan **Titik laporan lapangan** di peta utama, sejak halaman dibuka dan setelah penyimpanan/penghapusan. Popup memuat foto, judul, waktu WITA, catatan, dan koordinat. Tombol **Lihat laporan** menampilkan sebaran titik, sedangkan **Lihat titik di peta** pada galeri membuka satu laporan. Lapisan ini terpisah dari filter hotspot dan hanya membaca laporan di browser/perangkat yang sama. Laporan lama yang hanya berisi teks lokasi tetap dapat dibaca dan diekspor.
 
 ## Menjalankan dan menguji
 

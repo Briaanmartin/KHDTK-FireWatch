@@ -5,7 +5,7 @@
   <meta name="theme-color" content="#b32624">
   <meta name="description" content="WebGIS batas KHDTK Diklathut Fahutan Unmul Lempake dan pemantauan hotspot satelit NASA FIRMS.">
   <title>KHDTK Diklathut Fahutan Unmul Lempake · FireWatch</title>
-  <link rel="stylesheet" href="vendor/leaflet/leaflet.css"><link rel="stylesheet" href="style.css?v=20261012-fire-icons"><link rel="stylesheet" href="reports.css?v=20261012-fire-icons"><link rel="stylesheet" href="history.css?v=20261012-fire-icons">
+  <link rel="stylesheet" href="vendor/leaflet/leaflet.css"><link rel="stylesheet" href="style.css?v=20261012-report-layer"><link rel="stylesheet" href="reports.css?v=20261012-report-layer"><link rel="stylesheet" href="history.css?v=20261012-report-layer">
 </head>
 <body>
   <a class="skip" href="#map-section">Langsung ke peta</a>
@@ -34,6 +34,7 @@
         <div class="layer-options">
           <label><input id="show-boundary" type="checkbox" checked><span class="swatch boundary"></span>Batas KHDTK · SHP</label>
           <label><input id="show-hotspots" type="checkbox" checked><span class="fire-legend fire-high" data-fire-icon aria-hidden="true"></span>Hotspot NASA FIRMS</label>
+          <label><input id="show-reports" type="checkbox" checked><span class="swatch report" aria-hidden="true"></span>Titik laporan lapangan</label>
         </div>
         <hr><div class="section-label"><span>02</span> FILTER HOTSPOT</div>
         <label class="field">Periode pengamatan<select id="period"><option value="24">24 jam terakhir</option><option value="48">48 jam terakhir</option><option value="168" selected>7 hari terakhir</option></select></label>
@@ -43,7 +44,7 @@
         <p class="micro">Ikon api menunjukkan deteksi satelit hingga 25 km dari batas KHDTK. Warna menyatakan kepercayaan deteksi; hotspot perlu diverifikasi di lapangan.</p>
       </aside>
       <div class="map-panel">
-        <div class="map-toolbar"><div><span class="live-dot"></span><strong>KHDTK Lempake &amp; sekitarnya</strong><small id="map-count">Memuat lapisan</small></div><div><button id="fit-hotspots" class="secondary">Lihat hotspot</button></div></div>
+        <div class="map-toolbar"><div><span class="live-dot"></span><strong>KHDTK Lempake &amp; sekitarnya</strong><small id="map-count">Memuat lapisan</small><small id="report-map-count" aria-live="polite">Memuat laporan perangkat…</small></div><div><button id="fit-hotspots" class="secondary">Lihat hotspot</button><button id="fit-reports" class="secondary" disabled>Lihat laporan</button></div></div>
         <div id="map" tabindex="0" aria-label="Peta interaktif KHDTK"></div>
         <div class="map-footer"><span id="coordinates">WGS 84 · EPSG:4326</span><span>Geser peta untuk menjelajah · + / − atau cubit untuk zoom · klik batas atau titik untuk detail</span></div>
         <p id="tile-notice" class="tile-notice" hidden>Peta dasar gagal dimuat. Periksa koneksi atau pilih peta dasar lainnya; batas kawasan tetap tersedia.</p>
@@ -74,5 +75,5 @@
   </main>
   <footer><span>◈ <strong>FireWatch</strong> · KHDTK Lempake</span><a href="https://briaanmartin.github.io/profile.github.io/">Profil Brian Martin ↗</a><a href="https://github.com/briaanmartin/KHDTK-FireWatch">Kode & dokumentasi ↗</a></footer>
   <noscript><p class="system-notice">Aktifkan JavaScript untuk menggunakan peta interaktif dan filter hotspot.</p></noscript>
-  <script src="vendor/leaflet/leaflet.js"></script><script type="module" src="app.mjs?v=20261012-fire-icons"></script><script type="module" src="reports.mjs?v=20261012-fire-icons"></script><script type="module" src="history.mjs?v=20261012-fire-icons"></script>
+  <script src="vendor/leaflet/leaflet.js"></script><script type="module" src="app.mjs?v=20261012-report-layer"></script><script type="module" src="reports.mjs?v=20261012-report-layer"></script><script type="module" src="history.mjs?v=20261012-report-layer"></script>
 </body></html>
