@@ -8,7 +8,7 @@ const dateFormat = new Intl.DateTimeFormat('id-ID', {timeZone:'Asia/Makassar',da
 const number = value => new Intl.NumberFormat('id-ID',{maximumFractionDigits:2}).format(value);
 const dateText = value => value && Number.isFinite(Date.parse(value)) ? dateFormat.format(new Date(value)) : 'Belum tersedia';
 const escapeHTML = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-let map, boundary, info, boundaryLayer, hotspotLayer, currentBase;
+let map, boundary, info, boundaryLayer, hotspotLayer, currentBase, historyMarker;
 let detections = [], visible = [], status, dataLoaded = false, pageSize = 50, loading = false;
 const markerById = new Map();
 
@@ -55,6 +55,17 @@ function setupMap() {
   const toggle = (id,layer) => $(id).addEventListener('change',()=>$(id).checked ? layer.addTo(map) : map.removeLayer(layer));
   toggle('show-boundary',boundaryLayer);toggle('show-hotspots',hotspotLayer);
   $('fit-boundary').addEventListener('click',focusAOI);
+  document.addEventListener('history:show', event=>{
+    const feature=event.detail?.feature;
+    if(feature?.geometry?.type!=='Point' || !insideBoundary(feature.geometry.coordinates,boundary)) return;
+    const [lon,lat]=feature.geometry.coordinates,p=feature.properties || {};
+    if(!Number.isFinite(Date.parse(p.detected_at))) return;
+    if(historyMarker) map.removeLayer(historyMarker);
+    historyMarker=L.circleMarker([lat,lon],{radius:10,color:'#8d201e',weight:3,fillColor:'#f39c5b',fillOpacity:.9}).addTo(map);
+    historyMarker.bindPopup(`<span class="popup-label">DETEKSI ARSIP TAHUNAN</span><br><strong>${escapeHTML(p.satellite)}</strong><br>${dateText(p.detected_at)} WITA<br>Di dalam AOI KHDTK<br>Kepercayaan: ${labels[normalizeConfidence(p.confidence)]}<br>FRP: ${Number.isFinite(p.frp)?number(p.frp)+' MW':'Tidak tersedia'}<br>${lat.toFixed(5)}, ${lon.toFixed(5)}<br><small>Deteksi satelit; perlu verifikasi kejadian api.</small>`);
+    historyMarker.on('popupclose',()=>{if(historyMarker){map.removeLayer(historyMarker);historyMarker=null;}});
+    focusAOI();historyMarker.openPopup();$('map').scrollIntoView({behavior:'smooth',block:'center'});
+  });
   $('fit-hotspots').addEventListener('click',()=>{
     if (!hotspotLayer.getLayers().length) return;
     $('show-hotspots').checked=true;hotspotLayer.addTo(map);

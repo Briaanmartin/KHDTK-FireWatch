@@ -5,13 +5,13 @@
   <meta name="theme-color" content="#b32624">
   <meta name="description" content="WebGIS batas KHDTK Diklathut Fahutan Unmul Lempake dan pemantauan hotspot satelit NASA FIRMS.">
   <title>KHDTK Diklathut Fahutan Unmul Lempake · FireWatch</title>
-  <link rel="stylesheet" href="vendor/leaflet/leaflet.css"><link rel="stylesheet" href="style.css?v=20261011-aoi-photos"><link rel="stylesheet" href="reports.css?v=20261011-aoi-photos">
+  <link rel="stylesheet" href="vendor/leaflet/leaflet.css"><link rel="stylesheet" href="style.css?v=20261011-history"><link rel="stylesheet" href="reports.css?v=20261011-aoi-photos"><link rel="stylesheet" href="history.css?v=20261011-history">
 </head>
 <body>
   <a class="skip" href="#map-section">Langsung ke peta</a>
   <header class="topbar">
     <a class="brand" href="./"><span class="brand-icon">◈</span><span>FireWatch<small>KHDTK WEBGIS</small></span></a>
-    <nav aria-label="Navigasi utama"><a class="active" href="#map-section">Peta pemantauan</a><a href="#detections">Data hotspot</a><a href="#field-reports">Foto lapangan</a><a href="#about">Tentang data</a></nav>
+    <nav aria-label="Navigasi utama"><a class="active" href="#map-section">Peta pemantauan</a><a href="#detections">Data hotspot</a><a href="#history">Riwayat tahunan</a><a href="#field-reports">Foto lapangan</a><a href="#about">Tentang data</a></nav>
     <a class="source-link" href="https://firms.modaps.eosdis.nasa.gov/map/" target="_blank" rel="noopener">NASA FIRMS ↗</a>
   </header>
   <main>
@@ -56,6 +56,16 @@
       <button id="more" class="secondary" hidden>Tampilkan lebih banyak</button>
       <p class="micro">Setiap baris adalah deteksi satelit, bukan jumlah kejadian kebakaran. Satu kejadian dapat terdeteksi lebih dari sekali.</p>
     </section>
+    <section id="history" class="panel" aria-label="Riwayat api dan hotspot tahunan"><h2>Riwayat api &amp; hotspot</h2><p>Memuat arsip tahunan dalam AOI KHDTK…</p></section>
+    <section id="fire-context" class="panel" aria-labelledby="fire-context-title">
+      <div class="panel-head"><div><p class="eyebrow">CATATAN SUMBER PUBLIK · 2026</p><h2 id="fire-context-title">Pencegahan &amp; dampak karhutla di Lempake</h2><p>Informasi pendukung dari instansi resmi, diperiksa 11 Oktober 2026.</p></div></div>
+      <div class="fire-timeline">
+        <article><time datetime="2026-07-17">17 Juli 2026</time><h3>Program patroli KHDTK Lempake tercatat di SRUK</h3><p>SRUK mencatat persetujuan data umum program pengurangan deforestasi akibat kebakaran melalui patroli mahasiswa peduli api di KHDTK Lempake. Saat diperiksa, proses berada pada tahap data teknis.</p><a href="https://srukindonesia.kemenlh.go.id/activity/3e83db60-2b7d-4f2b-bd34-827a1f65bfd7" target="_blank" rel="noopener">Sumber: SRUK Kementerian Lingkungan Hidup ↗</a></article>
+        <article><time datetime="2026-09-05">5 September 2026</time><h3>Pembagian masker akibat asap karhutla</h3><p>Agenda resmi mencatat pembagian masker kepada masyarakat di wilayah Kelurahan Lempake akibat dampak asap kebakaran hutan dan lahan, bersama Babinsa dan Bhabinkamtibmas.</p><a href="https://kel-lempake.samarindakota.go.id/agenda/kegiatan-pembagian-masker-kepada-masyarakat-akibat-dampak-asap-kebakaran-hutan-dan-lahan-IPCXD" target="_blank" rel="noopener">Sumber: Kelurahan Lempake ↗</a></article>
+        <article><time datetime="2026-09-16">16 September 2026</time><h3>Pengumuman pencegahan karhutla</h3><p>Kelurahan Lempake menerbitkan pengumuman pencegahan kebakaran hutan dan lahan untuk masyarakat.</p><a href="https://kel-lempake.samarindakota.go.id/announcement/cegah-kebaran-hutan-dan-lahan-MKDCF" target="_blank" rel="noopener">Sumber: Kelurahan Lempake ↗</a></article>
+      </div>
+      <p class="micro">Catatan kegiatan dan dampak asap ini tidak menetapkan lokasi api di dalam AOI, jumlah kejadian kebakaran, atau luas terbakar KHDTK. Data kejadian terverifikasi belum tersedia pada situs ini.</p>
+    </section>
     <section id="field-reports" class="panel" aria-label="Foto laporan lapangan"></section>
     <section id="about" class="about-grid">
       <article><p class="eyebrow">BATAS KAWASAN</p><h2>Bersumber dari berkas Anda</h2><p id="boundary-description">SHP diproyeksikan ulang ke koordinat geografis WGS 84 untuk peta web.</p><p>Nama kawasan: <strong>KHDTK Diklathut Fahutan Unmul Lempake</strong>. Batas ditampilkan sesuai geometri berkas yang diberikan; luas bukan penetapan hukum.</p><a class="text-link" href="data/boundary.geojson" download="KHDTK-Lempake.geojson">Unduh batas GeoJSON ↓</a></article>
@@ -64,5 +74,5 @@
   </main>
   <footer><span>◈ <strong>FireWatch</strong> · KHDTK Lempake</span><a href="https://github.com/briaanmartin/KHDTK-FireWatch">Kode & dokumentasi ↗</a></footer>
   <noscript><p class="system-notice">Aktifkan JavaScript untuk menggunakan peta interaktif dan filter hotspot.</p></noscript>
-  <script src="vendor/leaflet/leaflet.js"></script><script type="module" src="app.mjs?v=20261011-aoi-photos"></script><script type="module" src="reports.mjs?v=20261011-aoi-photos"></script>
+  <script src="vendor/leaflet/leaflet.js"></script><script type="module" src="app.mjs?v=20261011-history"></script><script type="module" src="reports.mjs?v=20261011-aoi-photos"></script><script type="module" src="history.mjs?v=20261011-history"></script>
 </body></html>
