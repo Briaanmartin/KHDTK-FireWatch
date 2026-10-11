@@ -8,7 +8,7 @@ const dateFormat = new Intl.DateTimeFormat('id-ID', {timeZone:'Asia/Makassar',da
 const number = value => new Intl.NumberFormat('id-ID',{maximumFractionDigits:2}).format(value);
 const dateText = value => value && Number.isFinite(Date.parse(value)) ? dateFormat.format(new Date(value)) : 'Belum tersedia';
 const escapeHTML = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-let map, boundary, info, boundaryLayer, aoiLayer, hotspotLayer, currentBase;
+let map, boundary, info, boundaryLayer, hotspotLayer, currentBase;
 let detections = [], visible = [], status, dataLoaded = false, pageSize = 50, loading = false;
 const markerById = new Map();
 
@@ -21,9 +21,9 @@ function notice(message, tone = '') {
   $('system-notice').textContent = message;
   $('system-notice').className = `system-notice ${tone}`;
 }
-function setupMap(aoi) {
+function setupMap() {
   if (!window.L) throw new Error('Pustaka peta gagal dimuat. Silakan muat ulang halaman.');
-  map = L.map('map',{zoomControl:false,preferCanvas:false});
+  map = L.map('map',{zoomControl:false,preferCanvas:false,zoomSnap:.25,scrollWheelZoom:false,maxBoundsViscosity:1});
   L.control.zoom({position:'topright'}).addTo(map);
   L.control.scale({imperial:false,position:'bottomleft'}).addTo(map);
   const bases = {
@@ -33,28 +33,37 @@ function setupMap(aoi) {
   for (const layer of Object.values(bases)) {
     layer.on('tileerror',()=>{if(map.hasLayer(layer)) $('tile-notice').hidden=false;});
   }
-  currentBase = bases.street.addTo(map);
+  currentBase = bases.satellite.addTo(map);
   $('basemap').addEventListener('change',()=>{
     map.removeLayer(currentBase); currentBase = bases[$('basemap').value].addTo(map); $('tile-notice').hidden=true;
   });
   boundaryLayer = L.geoJSON(boundary,{style:{color:'#3d7033',weight:3,fillColor:'#8cbd5f',fillOpacity:.22}}).addTo(map);
   boundaryLayer.bindPopup(`<span class="popup-label">BATAS DARI SHP</span><br><strong>${NAME}</strong><br>Luas geodesik: ${number(info.areaHa)} ha<br>DGN95 / UTM 50S → WGS 84`);
   boundaryLayer.bindTooltip('Batas KHDTK Lempake');
-  aoiLayer = L.geoJSON(aoi,{style:{color:'#477eb2',weight:2,dashArray:'7 5',fillOpacity:.03}});
-  aoiLayer.bindPopup(`<strong>Poligon pembanding KML</strong><br>Luas: ${number(info.aoi.areaHa)} ha<br>Ditampilkan sesuai berkas KHDTK .kml.`);
+  // Mask the basemap outside the supplied SHP; the primary AOI remains unchanged.
+  map.createPane('aoi-mask');map.getPane('aoi-mask').style.zIndex=350;
+  const outer=[[-85,-180],[-85,180],[85,180],[85,-180]];
+  const holes=boundary.features.flatMap(f=>(f.geometry.type==='Polygon'?[f.geometry.coordinates]:f.geometry.coordinates).map(p=>p[0].map(([lon,lat])=>[lat,lon])));
+  L.polygon([outer,...holes],{pane:'aoi-mask',stroke:false,fillColor:'#f3f5f0',fillOpacity:1,interactive:false}).addTo(map);
+  const areaBounds=boundaryLayer.getBounds();
+  map.setMaxBounds(areaBounds.pad(.2));
+  const focusAOI=()=>{
+    map.setMinZoom(map.getBoundsZoom(areaBounds,false,L.point(32,32)));
+    map.fitBounds(areaBounds,{padding:[16,16],animate:false});
+  };
   hotspotLayer = L.featureGroup().addTo(map);
   const toggle = (id,layer) => $(id).addEventListener('change',()=>$(id).checked ? layer.addTo(map) : map.removeLayer(layer));
-  toggle('show-boundary',boundaryLayer);toggle('show-aoi',aoiLayer);toggle('show-hotspots',hotspotLayer);
-  $('fit-boundary').addEventListener('click',()=>map.fitBounds(boundaryLayer.getBounds(),{padding:[30,30]}));
+  toggle('show-boundary',boundaryLayer);toggle('show-hotspots',hotspotLayer);
+  $('fit-boundary').addEventListener('click',focusAOI);
   $('fit-hotspots').addEventListener('click',()=>{
     if (!hotspotLayer.getLayers().length) return;
     $('show-hotspots').checked=true;hotspotLayer.addTo(map);
-    map.fitBounds(hotspotLayer.getBounds().extend(boundaryLayer.getBounds()),{padding:[35,35],maxZoom:14});
+    focusAOI();
   });
   map.on('mousemove',event=>{$('coordinates').textContent=`${event.latlng.lat.toFixed(5)}, ${event.latlng.lng.toFixed(5)} · WGS 84`;});
   map.on('mouseout',()=>{$('coordinates').textContent='WGS 84 · EPSG:4326';});
-  new ResizeObserver(()=>map.invalidateSize()).observe($('map'));
-  map.fitBounds(boundaryLayer.getBounds(),{padding:[30,30]});
+  new ResizeObserver(()=>{map.invalidateSize();focusAOI();}).observe($('map'));
+  focusAOI();
 }
 function prepareDetections(collection) {
   if (collection.type !== 'FeatureCollection' || !Array.isArray(collection.features)) throw new Error('Format data hotspot tidak valid.');
@@ -68,7 +77,7 @@ function prepareDetections(collection) {
 function renderStatus() {
   const checked = Date.parse(status?.checked_at), age = Date.now() - checked;
   const stale = !Number.isFinite(checked) || age > 6*3600000;
-  let label='Data NASA FIRMS', tone='', message='Data satelit asli NASA FIRMS. Cakupan: batas SHP dan sekitar 25 km. Pembaruan dijadwalkan setiap jam; pengamatan mengikuti lintasan satelit.';
+  let label='Data NASA FIRMS', tone='', message='Peta dan daftar hotspot difokuskan pada AOI KHDTK dari batas SHP. Data NASA FIRMS diperbarui setiap jam; pengamatan mengikuti lintasan satelit.';
   if (status?.state==='error') { label='Sumber belum tersedia';tone='error';message='Pengambilan data hotspot gagal. Jika tersedia, catatan terakhir tetap ditampilkan dengan status data lama. Kondisi kawasan belum dapat disimpulkan dari data ini.'; }
   else if (status?.state==='partial') { label='Sebagian sumber tersedia';tone='warn';message='Sebagian sumber NASA FIRMS gagal diperbarui. Catatan tersimpan dari sumber tersebut ditandai sebagai data lama; cakupan pengamatan belum lengkap.'; }
   else if (stale) { label='Data perlu diperbarui';tone='warn';message='Pembaruan data terakhir sudah lebih dari 6 jam atau waktunya tidak tersedia. Tabel tetap menampilkan catatan dalam periode pilihan; periksa waktu pengamatan.'; }
@@ -88,19 +97,19 @@ function renderStatus() {
 function render() {
   if (!dataLoaded) return;
   const baseOptions={hours:Number($('period').value),confidence:$('confidence').value};
-  const all=filterDetections(detections,baseOptions);
+  const all=filterDetections(detections,{...baseOptions,scope:'inside'});
   visible=filterDetections(all,{...baseOptions,scope:$('scope').value});
   const unavailable=status.state==='error' && !detections.length;
   $('inside-stat').textContent=unavailable?'—':all.filter(f=>f.properties.inside).length;
-  $('near-stat').textContent=unavailable?'—':all.filter(f=>!f.properties.inside).length;
+  $('high-stat').textContent=unavailable?'—':all.filter(f=>f.properties.confidence==='high').length;
   $('latest-stat').textContent=all.length?dateText(all[0].properties.detected_at):'Tidak ada deteksi';
   if(unavailable) $('latest-stat').textContent='Belum tersedia';
-  $('map-count').textContent=`${visible.length} hotspot sesuai filter`;
+  $('map-count').textContent=`${visible.length} hotspot dalam AOI`;
   $('table-summary').textContent=unavailable?'Data hotspot belum tersedia':`${visible.length} deteksi · ${$('period').selectedOptions[0].text} · waktu WITA (UTC+8)`;
   $('export').disabled=!visible.length;$('fit-hotspots').disabled=!visible.length;
   $('empty').hidden=visible.length>0;
   $('empty-title').textContent=unavailable?'Data hotspot belum tersedia':'Tidak ada hotspot pada filter ini';
-  $('empty-text').textContent=unavailable?'Periksa status sumber data. Kegagalan pengambilan data tidak berarti tidak ada hotspot.':status.state==='ready'?'Tidak ditemukan deteksi dalam data yang tersedia. Coba periode 7 hari dan lokasi sekitar kawasan.':'Cakupan sumber belum lengkap. Tidak adanya baris pada filter ini belum mewakili seluruh pengamatan.';
+  $('empty-text').textContent=unavailable?'Periksa status sumber data. Kegagalan pengambilan data tidak berarti tidak ada hotspot.':status.state==='ready'?'Tidak ditemukan deteksi di dalam batas SHP pada periode pilihan. Anda dapat memeriksa periode 7 hari.':'Cakupan sumber belum lengkap. Tidak adanya baris pada filter ini belum mewakili seluruh pengamatan.';
   markerById.clear();hotspotLayer.clearLayers();
   for(const feature of visible) {
     const p=feature.properties,[lon,lat]=feature.geometry.coordinates;
@@ -148,13 +157,12 @@ async function loadHotspots() {
 }
 async function start() {
   try {
-    const values=await Promise.all([json('data/boundary.geojson'),json('data/aoi.geojson'),json('data/boundary-info.json')]);
-    [boundary,,info]=values;
+    [boundary,info]=await Promise.all([json('data/boundary.geojson'),json('data/boundary-info.json')]);
     $('area-stat').textContent=number(info.areaHa);
-    $('boundary-description').textContent=`Batas utama berasal dari AOI KRUS.shp, dengan luas geodesik ${number(info.areaHa)} ha. Proyeksi DGN95 / UTM Zona 50S (EPSG:23880) dikonversi ke WGS 84. Poligon KML seluas ${number(info.aoi.areaHa)} ha tersedia sebagai pembanding.`;
-    setupMap(values[1]);
-    ['period','scope','confidence'].forEach(id=>$(id).addEventListener('change',()=>{pageSize=50;render();}));
-    $('reset').addEventListener('click',()=>{$('period').value='168';$('scope').value='all';$('confidence').value='all';pageSize=50;render();});
+    $('boundary-description').textContent=`AOI utama berasal dari AOI KRUS.shp, dengan luas geodesik ${number(info.areaHa)} ha. Proyeksi DGN95 / UTM Zona 50S (EPSG:23880) dikonversi ke WGS 84. Tampilan peta dibatasi pada poligon SHP; KML tetap tersimpan sebagai data pembanding.`;
+    setupMap();
+    ['period','confidence'].forEach(id=>$(id).addEventListener('change',()=>{pageSize=50;render();}));
+    $('reset').addEventListener('click',()=>{$('period').value='168';$('scope').value='inside';$('confidence').value='all';pageSize=50;render();});
     $('more').addEventListener('click',()=>{pageSize+=50;renderRows();});
     $('refresh').addEventListener('click',loadHotspots);
     $('export').addEventListener('click',()=>{

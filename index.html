@@ -2,16 +2,16 @@
 <html lang="id">
 <head>
   <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-  <meta name="theme-color" content="#142f28">
+  <meta name="theme-color" content="#b32624">
   <meta name="description" content="WebGIS batas KHDTK Diklathut Fahutan Unmul Lempake dan pemantauan hotspot satelit NASA FIRMS.">
   <title>KHDTK Diklathut Fahutan Unmul Lempake · FireWatch</title>
-  <link rel="stylesheet" href="vendor/leaflet/leaflet.css"><link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="vendor/leaflet/leaflet.css"><link rel="stylesheet" href="style.css"><link rel="stylesheet" href="reports.css">
 </head>
 <body>
   <a class="skip" href="#map-section">Langsung ke peta</a>
   <header class="topbar">
     <a class="brand" href="./"><span class="brand-icon">◈</span><span>FireWatch<small>KHDTK WEBGIS</small></span></a>
-    <nav aria-label="Navigasi utama"><a class="active" href="#map-section">Peta pemantauan</a><a href="#detections">Data hotspot</a><a href="#about">Tentang data</a></nav>
+    <nav aria-label="Navigasi utama"><a class="active" href="#map-section">Peta pemantauan</a><a href="#detections">Data hotspot</a><a href="#field-reports">Foto lapangan</a><a href="#about">Tentang data</a></nav>
     <a class="source-link" href="https://firms.modaps.eosdis.nasa.gov/map/" target="_blank" rel="noopener">NASA FIRMS ↗</a>
   </header>
   <main>
@@ -23,40 +23,40 @@
     <section class="stats" aria-label="Ringkasan pemantauan">
       <article><span>LUAS POLIGON SHP</span><strong id="area-stat">—</strong><small>Hektare · perhitungan geodesik</small></article>
       <article><span>HOTSPOT DALAM KHDTK</span><strong id="inside-stat">—</strong><small>Sesuai periode & kepercayaan</small></article>
-      <article><span>HOTSPOT SEKITAR</span><strong id="near-stat">—</strong><small>Di luar batas · hingga 25 km</small></article>
+      <article><span>KEPERCAYAAN TINGGI</span><strong id="high-stat">—</strong><small>Deteksi di dalam AOI KHDTK</small></article>
       <article><span>DETEKSI TERBARU</span><strong id="latest-stat" class="compact">—</strong><small>Waktu akuisisi satelit · WITA</small></article>
     </section>
     <section id="map-section" class="map-layout" aria-label="WebGIS KHDTK">
       <aside class="map-sidebar">
         <div class="section-label"><span>01</span> KONTROL PETA</div><h2>Jelajahi kawasan</h2>
-        <label class="field">Peta dasar<select id="basemap"><option value="street">Peta jalan · OpenStreetMap</option><option value="satellite">Citra satelit · Esri</option></select></label>
+        <label class="field">Peta dasar<select id="basemap"><option value="street">Peta jalan · OpenStreetMap</option><option value="satellite" selected>Citra satelit · Esri</option></select></label>
         <div class="layer-options">
           <label><input id="show-boundary" type="checkbox" checked><span class="swatch boundary"></span>Batas KHDTK · SHP</label>
-          <label><input id="show-aoi" type="checkbox"><span class="swatch aoi"></span>Poligon pembanding · KML</label>
           <label><input id="show-hotspots" type="checkbox" checked><span class="swatch fire"></span>Hotspot NASA FIRMS</label>
         </div>
         <hr><div class="section-label"><span>02</span> FILTER HOTSPOT</div>
         <label class="field">Periode pengamatan<select id="period"><option value="24">24 jam terakhir</option><option value="48">48 jam terakhir</option><option value="168" selected>7 hari terakhir</option></select></label>
-        <label class="field">Lokasi deteksi<select id="scope"><option value="all">KHDTK + sekitar 25 km</option><option value="inside">Di dalam KHDTK</option><option value="near">Di luar KHDTK · ≤25 km</option></select></label>
+        <div class="field">Area pemantauan<p class="focus-description">AOI KHDTK · batas SHP</p><input type="hidden" id="scope" value="inside"></div>
         <label class="field">Kepercayaan deteksi<select id="confidence"><option value="all">Semua kepercayaan</option><option value="high">Tinggi</option><option value="nominal">Nominal</option><option value="low">Rendah</option></select></label>
         <button id="reset" class="secondary full">Reset filter</button>
         <div class="map-key"><span><i class="dot high"></i>Tinggi</span><span><i class="dot nominal"></i>Nominal</span><span><i class="dot low"></i>Rendah</span></div>
         <p class="micro">Warna menunjukkan kepercayaan deteksi satelit. Hotspot merupakan anomali panas dan perlu diverifikasi.</p>
       </aside>
       <div class="map-panel">
-        <div class="map-toolbar"><div><span class="live-dot"></span><strong>KHDTK Lempake</strong><small id="map-count">Memuat lapisan</small></div><div><button id="fit-boundary" class="secondary">⌖ Batas KHDTK</button><button id="fit-hotspots" class="secondary">◎ Hotspot</button></div></div>
+        <div class="map-toolbar"><div><span class="live-dot"></span><strong>AOI KHDTK Lempake</strong><small id="map-count">Memuat lapisan</small></div><div><button id="fit-boundary" class="secondary">⌖ Fokus AOI</button><button id="fit-hotspots" class="secondary">◎ Hotspot AOI</button></div></div>
         <div id="map" tabindex="0" aria-label="Peta interaktif KHDTK"></div>
-        <div class="map-footer"><span id="coordinates">WGS 84 · EPSG:4326</span><span>Gulir / cubit untuk zoom · klik poligon atau titik untuk detail</span></div>
+        <div class="map-footer"><span id="coordinates">WGS 84 · EPSG:4326</span><span>Tombol + / − atau cubit untuk zoom · klik area atau titik untuk detail</span></div>
         <p id="tile-notice" class="tile-notice" hidden>Peta dasar gagal dimuat. Periksa koneksi atau pilih peta dasar lainnya; batas kawasan tetap tersedia.</p>
       </div>
     </section>
     <section id="detections" class="panel">
-      <div class="panel-head"><div><p class="eyebrow">CATATAN DETEKSI</p><h2>Hotspot di kawasan & sekitarnya</h2><p id="table-summary">Memuat data…</p></div><button id="export" disabled>↓ Unduh CSV</button></div>
+      <div class="panel-head"><div><p class="eyebrow">CATATAN DETEKSI</p><h2>Hotspot dalam AOI KHDTK</h2><p id="table-summary">Memuat data…</p></div><button id="export" disabled>↓ Unduh CSV</button></div>
       <div class="table-wrap"><table><thead><tr><th>WAKTU (WITA)</th><th>SATELIT</th><th>LOKASI</th><th>KEPERCAYAAN</th><th>FRP (MW)</th><th>KOORDINAT</th><th>PETA</th></tr></thead><tbody id="rows"></tbody></table></div>
       <div id="empty" class="empty" hidden><span>◎</span><h3 id="empty-title">Tidak ada hotspot pada filter ini</h3><p id="empty-text">Ubah periode atau lokasi untuk melihat deteksi lainnya.</p></div>
       <button id="more" class="secondary" hidden>Tampilkan lebih banyak</button>
       <p class="micro">Setiap baris adalah deteksi satelit, bukan jumlah kejadian kebakaran. Satu kejadian dapat terdeteksi lebih dari sekali.</p>
     </section>
+    <section id="field-reports" class="panel" aria-label="Foto laporan lapangan"></section>
     <section id="about" class="about-grid">
       <article><p class="eyebrow">BATAS KAWASAN</p><h2>Bersumber dari berkas Anda</h2><p id="boundary-description">SHP diproyeksikan ulang ke koordinat geografis WGS 84 untuk peta web.</p><p>Nama kawasan: <strong>KHDTK Diklathut Fahutan Unmul Lempake</strong>. Batas ditampilkan sesuai geometri berkas yang diberikan; luas bukan penetapan hukum.</p><a class="text-link" href="data/boundary.geojson" download="KHDTK-Lempake.geojson">Unduh batas GeoJSON ↓</a></article>
       <article><p class="eyebrow">SUMBER HOTSPOT</p><h2>NASA FIRMS · VIIRS</h2><p>Data publik pengamatan 7 hari di Asia Tenggara diperiksa secara berkala. Waktu pembaruan dan kondisi setiap sumber ditampilkan di bawah.</p><ul id="source-list" class="source-list"><li>Memuat status sumber…</li></ul><p class="micro">Tidak ada deteksi tidak menjamin tidak ada kebakaran. Awan, waktu lintasan, dan ukuran sumber panas dapat memengaruhi deteksi.</p><a class="text-link" href="https://firms.modaps.eosdis.nasa.gov/active_fire/" target="_blank" rel="noopener">Lihat sumber NASA FIRMS ↗</a></article>
@@ -64,5 +64,5 @@
   </main>
   <footer><span>◈ <strong>FireWatch</strong> · KHDTK Lempake</span><a href="https://github.com/briaanmartin/KHDTK-FireWatch">Kode & dokumentasi ↗</a></footer>
   <noscript><p class="system-notice">Aktifkan JavaScript untuk menggunakan peta interaktif dan filter hotspot.</p></noscript>
-  <script src="vendor/leaflet/leaflet.js"></script><script type="module" src="app.mjs"></script>
+  <script src="vendor/leaflet/leaflet.js"></script><script type="module" src="app.mjs"></script><script type="module" src="reports.mjs"></script>
 </body></html>
