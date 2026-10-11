@@ -1,9 +1,40 @@
 import { insideBoundary } from './core.mjs';
-import { publishReports } from './report-state.mjs';
+import { publishReports, publishReportStatus } from './report-state.mjs?v=20261012-public-reports';
 
 const MAX_BYTES = 10 * 1024 * 1024;
 const IMAGE_TYPES = new Set(['image/jpeg', 'image/png', 'image/webp']);
 const DB_NAME = 'khdtk-firewatch-field-reports';
+
+export function normalizePublicReport(report, baseUrl) {
+  if (!report || typeof report.id !== 'string' || !/^[A-Za-z0-9_-]{1,120}$/.test(report.id)) throw new Error('ID laporan online tidak valid.');
+  const clean = validateReport(report);
+  const base = new URL(baseUrl), photo = new URL(report.photoUrl, base);
+  if (base.protocol !== 'https:' || photo.origin !== base.origin || photo.username || photo.password || photo.pathname !== `/api/reports/${encodeURIComponent(report.id)}/photo` || photo.search || photo.hash) throw new Error('Alamat foto laporan online tidak valid.');
+  if (!Number.isFinite(Date.parse(report.createdAt))) throw new Error('Waktu penyimpanan laporan online tidak valid.');
+  return { ...clean, id: report.id, createdAt: report.createdAt, photoUrl: photo.href };
+}
+
+export async function fetchPublicReports(baseUrl, fetcher = fetch) {
+  const records = new Map(), seenCursors = new Set();
+  let cursor;
+  do {
+    const url = new URL('/api/reports', baseUrl);
+    if (cursor) url.searchParams.set('cursor', cursor);
+    const response = await fetcher(url.href, { cache: 'no-store', credentials: 'omit', mode: 'cors', signal: AbortSignal.timeout(20000) });
+    if (!response.ok) throw new Error('Laporan online belum dapat dimuat.');
+    const page = await response.json();
+    if (!Array.isArray(page.reports)) throw new Error('Format laporan online tidak valid.');
+    for (const raw of page.reports) {
+      const report = normalizePublicReport(raw, baseUrl);
+      records.set(report.id, report);
+    }
+    cursor = page.nextCursor;
+    if (cursor != null && cursor !== '' && (typeof cursor !== 'string' || cursor.length > 512 || seenCursors.has(cursor))) throw new Error('Halaman laporan online tidak valid.');
+    if (cursor) seenCursors.add(cursor);
+    if (seenCursors.size > 100) throw new Error('Daftar laporan terlalu besar untuk dimuat sekaligus.');
+  } while (cursor);
+  return [...records.values()].sort((a, b) => Date.parse(b.createdAt) - Date.parse(a.createdAt));
+}
 
 export function validatePhoto(file) {
   if (!file || !IMAGE_TYPES.has(file.type)) throw new Error('Pilih foto JPEG, PNG, atau WebP.');
@@ -79,10 +110,15 @@ const readPhoto = blob => new Promise((resolve, reject) => {
 async function mountReports(root) {
   root.setAttribute('aria-labelledby', 'reports-heading');
   root.innerHTML = `
-    <div class="panel-head reports-heading"><div><p class="eyebrow">DOKUMENTASI & VERIFIKASI</p><h2 id="reports-heading">Foto laporan lapangan</h2><p>Catat kondisi kawasan melalui foto dan hasil pengamatan Anda.</p></div><span class="reports-device">Tersimpan di perangkat</span></div>
-    <div class="reports-notice">Laporan tersimpan hanya di browser dan perangkat ini, serta tidak otomatis dikirim ke tim. Unduh salinan laporan untuk dibagikan atau dicadangkan. Menghapus data browser dapat menghapus laporan.</div>
+    <div class="panel-head reports-heading"><div><p class="eyebrow">DOKUMENTASI & VERIFIKASI</p><h2 id="reports-heading">Foto laporan lapangan</h2><p>Laporan online, foto, dan titik pengamatan dapat dilihat semua pengunjung.</p></div><span class="reports-device reports-public-badge">Laporan publik</span></div>
+    <div class="reports-online-intro"><div><strong>Bagikan pengamatan lapangan</strong><p>Buka halaman laporan online untuk mengirim foto dan memilih titik pada peta. Masuk akun diperlukan untuk mengirim; melihat laporan tidak perlu masuk.</p></div><a id="report-online-link" class="report-online-link" aria-disabled="true" target="_blank" rel="noopener">Kirim laporan online ↗</a></div>
+    <div class="reports-public-head"><h3>Laporan online</h3><span id="public-reports-count">Memuat…</span><button id="public-reports-refresh" class="secondary" type="button">Muat ulang laporan</button></div>
+    <p id="public-reports-status" class="report-status" role="status" aria-live="polite">Memuat laporan online…</p>
+    <div id="public-reports-list" class="reports-public-list"></div>
+    <details id="reports-local" class="reports-local"><summary>Laporan lokal sebelumnya <span id="reports-local-count"></span></summary>
+    <div class="reports-notice">Laporan lama dan draf di bawah hanya tersimpan di browser ini. Isinya tidak diunggah otomatis. Gunakan Kirim laporan online jika Anda ingin membagikan laporan kepada semua pengunjung. Unduh salinan sebelum menghapus data browser.</div>
     <div class="reports-layout">
-      <form id="report-form"><fieldset id="report-fields"><legend class="report-form-title">Tambah laporan</legend>
+      <form id="report-form"><fieldset id="report-fields"><legend class="report-form-title">Buat draf lokal</legend>
         <label class="report-label" for="report-photo">Foto lapangan <span aria-hidden="true">*</span></label>
         <div class="report-upload"><span class="report-camera" aria-hidden="true">▧</span><strong>Pilih foto pengamatan</strong><span>JPEG, PNG, atau WebP · maksimal 10 MB</span><input id="report-photo" name="photo" type="file" accept="image/jpeg,image/png,image/webp" required aria-describedby="report-photo-note"></div>
         <p id="report-photo-note" class="micro">Gunakan foto kondisi lapangan yang ingin Anda dokumentasikan.</p>
@@ -96,14 +132,15 @@ async function mountReports(root) {
         <p id="report-point-summary" class="report-point-summary" role="status" aria-live="polite">Belum ada titik dipilih.</p>
         <p id="report-map-status" class="report-map-help" role="status">Menyiapkan peta lokasi…</p>
         <label class="report-label" for="report-notes">Catatan pengamatan</label><textarea id="report-notes" name="notes" rows="4" maxlength="3000" placeholder="Kondisi vegetasi, asap / api, atau hasil pemeriksaan…"></textarea>
-        <div class="report-form-actions"><button id="report-save" type="submit" disabled>Simpan di perangkat</button><button class="secondary" type="reset">Kosongkan</button></div>
+        <div class="report-form-actions"><button id="report-save" type="submit" disabled>Simpan draf lokal</button><button class="secondary" type="reset">Kosongkan</button></div>
       </fieldset></form>
-      <div class="reports-gallery"><div class="reports-gallery-head"><h3>Laporan tersimpan</h3><span id="reports-count">0 laporan</span></div><div id="reports-list"></div></div>
-    </div><p id="report-status" class="report-status" role="status" aria-live="polite">Menyiapkan penyimpanan perangkat…</p>`;
+      <div class="reports-gallery"><div class="reports-gallery-head"><h3>Draf & laporan lokal</h3><span id="reports-count">0 laporan</span></div><div id="reports-list"></div></div>
+    </div><p id="report-status" class="report-status" role="status" aria-live="polite">Menyiapkan penyimpanan browser…</p></details>`;
   const $ = selector => root.querySelector(selector);
   const form = $('#report-form'), fields = $('#report-fields'), save = $('#report-save'), list = $('#reports-list');
   const preview = $('#report-preview'), previewWrap = $('#report-preview-wrap'), status = $('#report-status');
   let database, reports = [], reportsLoaded = false, photo, previewURL, selection = 0, decoding = false, busy = false;
+  let publicReports = [], publicLoaded = false, publicLoading = false, serviceBaseUrl;
   let point = null, picker, pointMarker, pickerBoundary, boundaryLayer, mapResize;
   const cardURLs = new Set(), downloadURLs = new Set();
   const feedback = (message, error = false) => { status.textContent = message; status.classList.toggle('is-error', error); };
@@ -111,6 +148,72 @@ async function mountReports(root) {
   const currentWita = () => new Date(Date.now() + 8 * 3600000).toISOString().slice(0, 16);
   $('#report-observed').value = currentWita();
   const pointRelation = coordinates => pickerBoundary ? `${insideBoundary([coordinates.longitude, coordinates.latitude], pickerBoundary) ? 'Di dalam' : 'Di luar'} batas AOI KHDTK` : 'Batas AOI belum dimuat';
+  function publishCombined() {
+    publishReports([
+      ...publicReports.map(report => ({ ...report, sourceId: report.id, id: `public:${report.id}`, scope: 'public' })),
+      ...(reportsLoaded ? reports : []).map(report => ({ ...report, sourceId: report.id, id: `local:${report.id}`, scope: 'local' }))
+    ]);
+  }
+  function showPointButton(report, scope) {
+    const coordinates = savedPoint(report);
+    if (!coordinates) return null;
+    const button = node('button', 'secondary', 'Lihat titik di peta'); button.type = 'button';
+    button.addEventListener('click', () => document.dispatchEvent(new CustomEvent('report:show', { detail: { report: { id: `${scope}:${report.id}`, sourceId: report.id, scope, title: report.title, observedAt: report.observedAt, ...coordinates } } })));
+    return button;
+  }
+  function renderPublicReports() {
+    const publicList = $('#public-reports-list'); publicList.replaceChildren();
+    $('#public-reports-count').textContent = publicLoaded ? `${publicReports.length} laporan publik` : 'Belum dimuat';
+    if (publicLoaded && !publicReports.length) {
+      const empty = node('div', 'reports-empty reports-public-empty');
+      empty.append(node('span', 'reports-empty-icon', '▧'), node('h4', '', 'Belum ada laporan online'), node('p', '', 'Kirim laporan lapangan pertama. Foto dan titik yang Anda terbitkan akan terlihat oleh semua pengunjung.'));
+      publicList.append(empty);
+    }
+    for (const report of publicReports) {
+      const card = node('article', 'report-card report-public-card'), image = node('img');
+      image.src = report.photoUrl; image.alt = `Foto: ${report.title}`; image.loading = 'lazy'; image.referrerPolicy = 'no-referrer';
+      const body = node('div', 'report-card-body'), coordinates = savedPoint(report);
+      body.append(node('p', 'report-card-date', `${formatObserved(report.observedAt)} · Publik`), node('h4', '', report.title), node('p', 'report-card-location', `${coordinates.latitude.toFixed(6)}, ${coordinates.longitude.toFixed(6)} · WGS 84${pickerBoundary ? ` · ${pointRelation(coordinates)}` : ''}`));
+      if (report.notes) body.append(node('p', 'report-card-notes', report.notes));
+      const actions = node('div', 'report-card-actions'); actions.append(showPointButton(report, 'public'));
+      body.append(actions); card.append(image, body); publicList.append(card);
+    }
+  }
+  function setPublicStatus(state, message) {
+    const element = $('#public-reports-status'); element.textContent = message; element.classList.toggle('is-error', state === 'error');
+    publishReportStatus({ state, publicCount: publicReports.length, hasLoaded: publicLoaded, message });
+  }
+  async function refreshPublicReports() {
+    if (publicLoading) return;
+    publicLoading = true; $('#public-reports-refresh').disabled = true;
+    setPublicStatus('loading', publicLoaded ? 'Memperbarui laporan online…' : 'Memuat laporan online…');
+    if (!publicLoaded) $('#public-reports-count').textContent = 'Memuat…';
+    try {
+      if (!serviceBaseUrl) {
+        const response = await fetch('data/report-service.json', { cache: 'no-cache', signal: AbortSignal.timeout(20000) });
+        if (!response.ok) throw new Error('Alamat layanan laporan belum tersedia.');
+        const configuration = await response.json(), base = new URL(configuration.baseUrl);
+        if (base.protocol !== 'https:' || base.username || base.password || base.search || base.hash || base.pathname !== '/') throw new Error('Alamat layanan laporan tidak valid.');
+        serviceBaseUrl = base.origin;
+        $('#report-online-link').href = serviceBaseUrl;
+        $('#report-online-link').removeAttribute('aria-disabled');
+      }
+      const loaded = await fetchPublicReports(serviceBaseUrl);
+      publicReports = loaded; publicLoaded = true;
+      renderPublicReports(); publishCombined();
+      setPublicStatus('ready', publicReports.length ? 'Laporan online terbaru ditampilkan di galeri dan peta untuk semua pengunjung.' : 'Belum ada laporan yang diterbitkan. Laporan lokal lama tetap tersimpan pribadi di browser Anda.');
+    } catch (error) {
+      if (!publicLoaded) $('#public-reports-count').textContent = 'Belum tersedia';
+      setPublicStatus('error', publicLoaded
+        ? 'Pembaruan laporan online gagal. Laporan yang terakhir dimuat tetap terlihat; coba Muat ulang laporan.'
+        : 'Laporan online belum dapat dimuat. Periksa koneksi lalu pilih Muat ulang laporan. Ini bukan berarti belum ada laporan.');
+      console.error('Laporan online gagal dimuat:', error);
+    } finally { publicLoading = false; $('#public-reports-refresh').disabled = false; }
+  }
+  $('#public-reports-refresh').addEventListener('click', refreshPublicReports);
+  window.addEventListener('focus', refreshPublicReports);
+  document.addEventListener('visibilitychange', () => { if (!document.hidden) void refreshPublicReports(); });
+  void refreshPublicReports();
   function updatePointSummary() {
     $('#report-point-summary').textContent = point ? `${point.latitude.toFixed(6)}, ${point.longitude.toFixed(6)} · WGS 84 · ${pointRelation(point)}` : 'Belum ada titik dipilih.';
     $('#report-point-summary').classList.toggle('has-point', Boolean(point));
@@ -164,15 +267,20 @@ async function mountReports(root) {
         if (!point) picker.fitBounds(boundaryLayer.getBounds(), { padding: [20, 20], maxZoom: 16 });
         $('#report-fit-boundary').disabled = false;
         mapStatus.textContent = 'Garis merah menunjukkan batas KHDTK. Peta dapat digeser ke lokasi pengamatan.';
-        updatePointSummary(); renderReports();
+        updatePointSummary(); renderReports(); renderPublicReports();
       } catch {
         pickerBoundary = undefined;
         mapStatus.textContent = 'Batas KHDTK belum tersedia. Anda tetap dapat memilih titik pada peta; muat ulang untuk mencoba memuat batas.';
       }
     } catch (error) { mapStatus.textContent = error.message || 'Peta lokasi belum tersedia. Muat ulang halaman untuk mencoba lagi.'; }
   }
-  // Keep map loading independent of IndexedDB: saved reports remain accessible if map loading fails.
-  void setupPicker();
+  // The old local editor stays available without loading another map until opened.
+  let pickerStarted = false;
+  $('#reports-local').addEventListener('toggle', () => {
+    if (!$('#reports-local').open) return;
+    if (!pickerStarted) { pickerStarted = true; void setupPicker(); }
+    else picker?.invalidateSize({ pan: false });
+  });
   function clearPreview() {
     photo = undefined;
     if (previewURL) URL.revokeObjectURL(previewURL);
@@ -194,7 +302,7 @@ async function mountReports(root) {
       photo = file; previewURL = url; url = undefined;
       preview.src = previewURL; previewWrap.hidden = false;
       $('#report-filename').textContent = `${file.name} · ${(file.size / 1024 / 1024).toFixed(2)} MB`;
-      feedback(database ? 'Foto siap. Lengkapi pengamatan lalu simpan di perangkat.' : 'Foto siap, tetapi penyimpanan browser belum tersedia. Foto belum disimpan.', !database);
+      feedback(database ? 'Foto siap. Lengkapi pengamatan lalu simpan sebagai draf lokal.' : 'Foto siap, tetapi penyimpanan browser belum tersedia. Foto belum disimpan.', !database);
     } catch (error) {
       if (token === selection) feedback(error.name === 'EncodingError' ? 'Berkas tidak dapat dibuka sebagai foto. Pilih JPEG, PNG, atau WebP yang valid.' : error.message, true);
     } finally {
@@ -214,10 +322,10 @@ async function mountReports(root) {
       validatePhoto(photo);
       const data = validateReport({ ...Object.fromEntries(new FormData(form)), ...point });
       const report = { ...data, ...(pickerBoundary ? { insideAOI: insideBoundary([data.longitude, data.latitude], pickerBoundary) } : {}), id: crypto.randomUUID(), createdAt: new Date().toISOString(), photo };
-      busy = true; fields.disabled = true; updateSave(); feedback('Menyimpan foto dan laporan…');
+      busy = true; fields.disabled = true; updateSave(); feedback('Menyimpan foto dan draf lokal…');
       await transaction(database, 'readwrite', store => store.add(report));
       reports.unshift(report); renderReports(); form.reset();
-      feedback('Laporan berhasil disimpan di perangkat ini. Unduh HTML untuk salinan yang dapat dibagikan.');
+      feedback('Draf lokal disimpan di browser ini dan belum dipublikasikan. Gunakan Kirim laporan online untuk membagikan pengamatan.');
     } catch (error) {
       feedback(error.name === 'QuotaExceededError' ? 'Penyimpanan perangkat penuh. Laporan belum disimpan; foto dan isian tetap tersedia.' : `Laporan belum disimpan. ${error.message || 'Penyimpanan browser tidak dapat diakses.'}`, true);
     } finally { busy = false; fields.disabled = false; updateSave(); }
@@ -227,12 +335,13 @@ async function mountReports(root) {
     if (text !== undefined) element.textContent = text; return element;
   }
   function renderReports() {
-    if (reportsLoaded) publishReports(reports);
+    if (reportsLoaded) publishCombined();
     cardURLs.forEach(url => URL.revokeObjectURL(url)); cardURLs.clear(); list.replaceChildren();
     $('#reports-count').textContent = `${reports.length} laporan`;
+    $('#reports-local-count').textContent = reports.length ? `· ${reports.length}` : '';
     if (!reports.length) {
       const empty = node('div', 'reports-empty');
-      empty.append(node('span', 'reports-empty-icon', '▧'), node('h4', '', 'Belum ada laporan lapangan'), node('p', '', 'Tambahkan foto pertama untuk mendokumentasikan kondisi KHDTK.'));
+      empty.append(node('span', 'reports-empty-icon', '▧'), node('h4', '', 'Belum ada draf lokal'), node('p', '', 'Draf di bagian ini hanya tersedia di browser Anda. Gunakan laporan online untuk berbagi dengan pengunjung lain.'));
       list.append(empty); return;
     }
     for (const report of reports) {
@@ -245,15 +354,11 @@ async function mountReports(root) {
       if (report.notes) body.append(node('p', 'report-card-notes', report.notes));
       const actions = node('div', 'report-card-actions'), download = node('button', 'secondary', '↓ Unduh HTML'), remove = node('button', 'report-delete', 'Hapus');
       download.type = remove.type = 'button';
-      if (coordinates) {
-        const showPoint = node('button', 'secondary', 'Lihat titik di peta'); showPoint.type = 'button';
-        showPoint.addEventListener('click', () => document.dispatchEvent(new CustomEvent('report:show', { detail: { report: { id: report.id, title: report.title, observedAt: report.observedAt, ...coordinates } } })));
-        actions.append(showPoint);
-      }
+      if (coordinates) actions.append(showPointButton(report, 'local'));
       actions.append(download, remove);
       const confirm = node('div', 'report-confirm'); confirm.hidden = true;
       const yes = node('button', 'report-confirm-yes', 'Ya, hapus'), cancel = node('button', 'secondary', 'Batal');
-      yes.type = cancel.type = 'button'; confirm.append(node('p', '', 'Hapus laporan ini dari perangkat?'), yes, cancel);
+      yes.type = cancel.type = 'button'; confirm.append(node('p', '', 'Hapus laporan lokal ini dari browser?'), yes, cancel);
       remove.addEventListener('click', () => { confirm.hidden = false; remove.hidden = true; cancel.focus(); });
       cancel.addEventListener('click', () => { confirm.hidden = true; remove.hidden = false; remove.focus(); });
       yes.addEventListener('click', async () => {
@@ -261,7 +366,7 @@ async function mountReports(root) {
         try {
           await transaction(database, 'readwrite', store => store.delete(report.id));
           reports = reports.filter(item => item.id !== report.id); renderReports();
-          feedback('Laporan dihapus dari perangkat ini.'); $('#reports-heading').tabIndex = -1; $('#reports-heading').focus({ preventScroll: true });
+          feedback('Laporan lokal dihapus dari browser ini.'); $('#reports-heading').tabIndex = -1; $('#reports-heading').focus({ preventScroll: true });
         } catch { feedback('Laporan belum dihapus. Penyimpanan perangkat tidak dapat diakses.', true); yes.disabled = cancel.disabled = false; }
       });
       download.addEventListener('click', async () => {
@@ -285,7 +390,7 @@ async function mountReports(root) {
     database.onversionchange = () => { database.close(); database = undefined; updateSave(); feedback('Penyimpanan berubah. Muat ulang halaman sebelum menyimpan laporan baru.', true); };
     reports = (await transaction(database, 'readonly', store => store.getAll())).sort((a, b) => b.createdAt.localeCompare(a.createdAt));
     reportsLoaded = true;
-    renderReports(); updateSave(); feedback('Penyimpanan perangkat siap. Laporan Anda tidak otomatis dikirim ke tim.');
+    renderReports(); updateSave(); feedback('Penyimpanan lokal siap. Draf di bagian ini tetap pribadi dan tidak diunggah otomatis.');
   } catch (error) { database?.close(); database = undefined; updateSave(); feedback(`Penyimpanan perangkat tidak tersedia. ${error.message || 'Periksa pengaturan browser lalu muat ulang.'} Foto dan isian belum disimpan.`, true); }
   window.addEventListener('pagehide', event => { if (event.persisted) return; if (previewURL) URL.revokeObjectURL(previewURL); cardURLs.forEach(url => URL.revokeObjectURL(url)); downloadURLs.forEach(url => URL.revokeObjectURL(url)); database?.close(); mapResize?.disconnect(); picker?.remove(); });
 }

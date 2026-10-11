@@ -75,11 +75,19 @@ Catatan sumber publik tahun 2026 berasal dari [SRUK](https://srukindonesia.kemen
 
 ## Foto laporan lapangan
 
-Foto JPEG, PNG, atau WebP (maksimum 10 MB) dan catatan disimpan menggunakan IndexedDB di browser/perangkat yang dipakai. Laporan tidak dikirim ke server, repository, atau anggota tim. Gunakan unduh laporan HTML untuk menyimpan salinan beserta foto atau membagikannya sendiri. Data browser dapat hilang jika penyimpanan situs dihapus; lakukan ekspor untuk salinan arsip. Alamat localhost dan GitHub Pages mempunyai penyimpanan berbeda.
+Laporan **publik** disimpan online melalui [Laporan Lapangan FireWatch](https://khdtk-firewatch-laporan.brianmartin.chatgpt.site). WebGIS GitHub Pages membaca feed yang sama sehingga foto, catatan, waktu WITA, dan titik laporan dapat dilihat semua pengunjung/perangkat. Klik **Kirim laporan online**, masuk dengan ChatGPT, pilih foto dan titik pada peta, lalu pilih **Publikasikan laporan**. Membaca laporan tidak memerlukan akun.
 
-Galeri awal kosong. Tidak ada foto lapangan buatan atau foto contoh yang disajikan sebagai laporan nyata.
+Laporan merupakan pengamatan pengguna yang belum diverifikasi, bukan otomatis kejadian kebakaran terkonfirmasi. Formulir menjelaskan bahwa foto, catatan, dan koordinat akan menjadi publik. Email dan identitas akun tidak ditampilkan pada feed publik. Hanya pengirim yang dapat mengarsipkan atau memulihkan laporan miliknya; pengarsipan menyembunyikannya dari pengunjung dan dapat dibatalkan.
 
-Lokasi laporan baru dipilih dengan klik/ketuk pada peta, lalu dapat dikoreksi dengan menggeser penanda. Pengguna keyboard dapat menggeser peta memakai tombol panah dan memilih **Gunakan tengah peta**. Koordinat WGS 84 dan status di dalam/di luar batas SHP disimpan bersama laporan serta disertakan dalam unduhan. Semua laporan berkoordinat otomatis tampil sebagai pin kamera biru pada lapisan **Titik laporan lapangan** di peta utama, sejak halaman dibuka dan setelah penyimpanan/penghapusan. Popup memuat foto, judul, waktu WITA, catatan, dan koordinat. Tombol **Lihat laporan** menampilkan sebaran titik, sedangkan **Lihat titik di peta** pada galeri membuka satu laporan. Lapisan ini terpisah dari filter hotspot dan hanya membaca laporan di browser/perangkat yang sama. Laporan lama yang hanya berisi teks lokasi tetap dapat dibaca dan diekspor.
+Pin kamera biru pada **Titik laporan lapangan** menunjukkan laporan publik serta draft lokal yang masih ada di browser. Popup membedakan keduanya, memuat foto, waktu, catatan, koordinat dan hubungan titik dengan batas SHP. **Lihat laporan** menampilkan semua titik; filter hotspot tidak memengaruhi laporan. Galeri mengambil pembaruan ketika tab kembali aktif atau tombol muat ulang ditekan, dan menampilkan kegagalan koneksi secara terpisah dari daftar kosong.
+
+Laporan versi lama tetap tersedia di bagian **Laporan lokal sebelumnya** pada browser/perangkat asal dan tidak diunggah otomatis. Localhost dan GitHub Pages memiliki penyimpanan lokal yang terpisah. Ekspor HTML menyimpan salinan foto/catatan/titik dari draft lama. Untuk mempublikasikannya, kirim melalui formulir online. Tidak ada data uji atau foto contoh yang dipublikasikan sebagai laporan nyata.
+
+### Layanan laporan online
+
+Konfigurasi frontend: `data/report-service.json`. Layanan Sites memakai D1 untuk catatan dan R2 untuk foto. Sumber layanan dipelihara dalam repository Sites untuk proyek `appgprj_6acbb7e5ffb081918ba38e25d0522b02`; checkout lokal pada `artifacts/report-service` sengaja tidak ikut deployment GitHub Pages. Manifest layanan menetapkan binding `DB` dan `BUCKET`, migrasi dikelola oleh Sites. Tidak ada token atau rahasia dalam frontend GitHub.
+
+API baca publik: `GET /api/reports` dengan paginasi cursor dan `GET /api/reports/{id}/photo`. Operasi tulis memakai identitas server, validasi foto/ukuran/koordinat/waktu, persetujuan publikasi, pemeriksaan origin, batas pengiriman, dan request ID untuk mencegah duplikasi saat mencoba ulang. Feed tidak mengirim email atau ID akun.
 
 ## Menjalankan dan menguji
 
