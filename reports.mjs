@@ -1,3 +1,5 @@
+import { insideBoundary } from './core.mjs';
+
 const MAX_BYTES = 10 * 1024 * 1024;
 const IMAGE_TYPES = new Set(['image/jpeg', 'image/png', 'image/webp']);
 const DB_NAME = 'khdtk-firewatch-field-reports';
@@ -7,10 +9,20 @@ export function validatePhoto(file) {
   if (!file.size || file.size > MAX_BYTES) throw new Error('Ukuran foto harus lebih dari 0 dan maksimal 10 MB.');
 }
 
-export function validateReport({ title, observedAt, location, notes }) {
-  const clean = { title: String(title || '').trim(), observedAt: String(observedAt || ''), location: String(location || '').trim(), notes: String(notes || '').trim() };
+export function validateCoordinates({ latitude, longitude } = {}) {
+  if (typeof latitude !== 'number' || typeof longitude !== 'number' || !Number.isFinite(latitude) || !Number.isFinite(longitude) || latitude < -90 || latitude > 90 || longitude < -180 || longitude > 180) {
+    throw new Error('Pilih titik pengamatan pada peta. Koordinat harus berupa lintang dan bujur yang valid.');
+  }
+  return { latitude, longitude };
+}
+
+export function validateReport({ title, observedAt, latitude, longitude, location, notes }, { allowLegacyLocation = false } = {}) {
+  const clean = { title: String(title || '').trim(), observedAt: String(observedAt || ''), notes: String(notes || '').trim() };
   if (!clean.title || clean.title.length > 120) throw new Error('Isi judul laporan, maksimal 120 karakter.');
-  if (!clean.location || clean.location.length > 160) throw new Error('Isi lokasi atau blok pengamatan, maksimal 160 karakter.');
+  if (allowLegacyLocation && latitude === undefined && longitude === undefined) {
+    clean.location = String(location || '').trim();
+    if (!clean.location || clean.location.length > 160) throw new Error('Lokasi laporan lama tidak valid.');
+  } else Object.assign(clean, validateCoordinates({ latitude, longitude }));
   if (clean.notes.length > 3000) throw new Error('Catatan maksimal 3.000 karakter.');
   const instant = Date.parse(`${clean.observedAt}:00+08:00`);
   if (!/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/.test(clean.observedAt) || !Number.isFinite(instant) || new Date(instant + 8 * 3600000).toISOString().slice(0, 16) !== clean.observedAt) throw new Error('Isi tanggal dan jam pengamatan yang valid dalam WITA.');
@@ -22,8 +34,17 @@ const formatObserved = value => new Intl.DateTimeFormat('id-ID', { dateStyle: 'l
 
 export function exportReportHTML(report, photoDataURL) {
   if (!/^data:image\/(jpeg|png|webp);base64,[A-Za-z0-9+/=]+$/.test(photoDataURL)) throw new Error('Foto tidak dapat disertakan dalam ekspor.');
-  const safe = Object.fromEntries(Object.entries(validateReport(report)).map(([key, value]) => [key, escapeHTML(value)]));
-  return `<!doctype html><html lang="id"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${safe.title} · Laporan lapangan</title><style>body{font:16px/1.6 system-ui,sans-serif;color:#233d33;background:#f3f5f0;margin:0;padding:30px}main{max-width:900px;margin:auto;background:white;border-top:6px solid #b32624;padding:28px;border-radius:8px}h1{line-height:1.2}img{display:block;max-width:100%;max-height:80vh;margin:24px auto;object-fit:contain}p{overflow-wrap:anywhere}.notes{white-space:pre-wrap}.meta,footer{color:#66766a;font-size:14px}footer{border-top:1px solid #ddd;padding-top:18px}@media print{body{padding:0;background:white}main{padding:10px}img{max-height:55vh}}</style><main><p class="meta">FIREWATCH · LAPORAN LAPANGAN</p><h1>${safe.title}</h1><p>KHDTK Diklathut Fahutan Unmul Lempake</p><p><strong>Pengamatan:</strong> ${escapeHTML(formatObserved(report.observedAt))}<br><strong>Lokasi / blok:</strong> ${safe.location}</p><img src="${photoDataURL}" alt="Foto pengamatan lapangan"><h2>Catatan pengamatan</h2><p class="notes">${safe.notes || 'Tidak ada catatan tambahan.'}</p><footer>Laporan diisi oleh pengguna dan diekspor dari penyimpanan browser. Isi laporan belum diverifikasi dan tidak otomatis dikirim ke tim.</footer></main></html>`;
+  const clean = validateReport(report, { allowLegacyLocation: true });
+  const safe = Object.fromEntries(Object.entries(clean).map(([key, value]) => [key, escapeHTML(value)]));
+  const locationHTML = clean.latitude !== undefined
+    ? `<strong>Titik pengamatan (WGS 84):</strong> ${clean.latitude.toFixed(6)}, ${clean.longitude.toFixed(6)}<br><a href="${escapeHTML(pointURL(clean))}" target="_blank" rel="noopener noreferrer">Buka titik di OpenStreetMap</a>${typeof report.insideAOI === 'boolean' ? `<br>${report.insideAOI ? 'Di dalam' : 'Di luar'} batas AOI KHDTK saat laporan dibuat.` : ''}`
+    : `<strong>Lokasi / blok (laporan lama):</strong> ${safe.location}`;
+  return `<!doctype html><html lang="id"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${safe.title} · Laporan lapangan</title><style>body{font:16px/1.6 system-ui,sans-serif;color:#233d33;background:#f3f5f0;margin:0;padding:30px}main{max-width:900px;margin:auto;background:white;border-top:6px solid #b32624;padding:28px;border-radius:8px}h1{line-height:1.2}img{display:block;max-width:100%;max-height:80vh;margin:24px auto;object-fit:contain}p{overflow-wrap:anywhere}.notes{white-space:pre-wrap}.meta,footer{color:#66766a;font-size:14px}footer{border-top:1px solid #ddd;padding-top:18px}@media print{body{padding:0;background:white}main{padding:10px}img{max-height:55vh}}</style><main><p class="meta">FIREWATCH · LAPORAN LAPANGAN</p><h1>${safe.title}</h1><p>KHDTK Diklathut Fahutan Unmul Lempake</p><p><strong>Pengamatan:</strong> ${escapeHTML(formatObserved(report.observedAt))}<br>${locationHTML}</p><img src="${photoDataURL}" alt="Foto pengamatan lapangan"><h2>Catatan pengamatan</h2><p class="notes">${safe.notes || 'Tidak ada catatan tambahan.'}</p><footer>Laporan diisi oleh pengguna dan diekspor dari penyimpanan browser. Isi laporan belum diverifikasi dan tidak otomatis dikirim ke tim.</footer></main></html>`;
+}
+
+const pointURL = ({ latitude, longitude }) => `https://www.openstreetmap.org/?mlat=${latitude}&mlon=${longitude}#map=17/${latitude}/${longitude}`;
+function savedPoint(report) {
+  try { return validateCoordinates(report); } catch { return null; }
 }
 
 function openDatabase() {
@@ -66,7 +87,13 @@ async function mountReports(root) {
         <p id="report-photo-note" class="micro">Gunakan foto kondisi lapangan yang ingin Anda dokumentasikan.</p>
         <figure id="report-preview-wrap" class="report-preview" hidden><img id="report-preview" alt="Pratinjau foto yang dipilih"><figcaption id="report-filename"></figcaption></figure>
         <label class="report-label" for="report-title">Judul laporan <span aria-hidden="true">*</span></label><input id="report-title" name="title" maxlength="120" placeholder="Contoh: Pemeriksaan blok utara" required>
-        <div class="report-form-row"><div><label class="report-label" for="report-observed">Waktu pengamatan (WITA) <span aria-hidden="true">*</span></label><input id="report-observed" name="observedAt" type="datetime-local" required></div><div><label class="report-label" for="report-location">Lokasi / blok <span aria-hidden="true">*</span></label><input id="report-location" name="location" maxlength="160" placeholder="Nama blok atau titik pengamatan" required></div></div>
+        <label class="report-label" for="report-observed">Waktu pengamatan (WITA) <span aria-hidden="true">*</span></label><input id="report-observed" name="observedAt" type="datetime-local" required>
+        <p id="report-point-label" class="report-label">Titik pengamatan <span aria-hidden="true">*</span></p>
+        <p id="report-map-help" class="report-map-help">Ketuk atau klik peta untuk menaruh titik. Geser penanda untuk memperbaiki lokasi. Dengan keyboard, fokuskan peta dan gunakan tombol panah, lalu pilih “Gunakan tengah peta” pada tanda +. Titik boleh berada di dalam maupun di sekitar batas KHDTK.</p>
+        <div id="report-map" class="report-map" tabindex="0" role="region" aria-labelledby="report-point-label" aria-describedby="report-map-help"></div>
+        <div class="report-map-actions"><button id="report-use-center" class="secondary" type="button" disabled>Gunakan tengah peta</button><button id="report-fit-boundary" class="secondary" type="button" disabled>Lihat batas KHDTK</button><button id="report-clear-point" class="secondary" type="button" disabled>Hapus titik</button></div>
+        <p id="report-point-summary" class="report-point-summary" role="status" aria-live="polite">Belum ada titik dipilih.</p>
+        <p id="report-map-status" class="report-map-help" role="status">Menyiapkan peta lokasi…</p>
         <label class="report-label" for="report-notes">Catatan pengamatan</label><textarea id="report-notes" name="notes" rows="4" maxlength="3000" placeholder="Kondisi vegetasi, asap / api, atau hasil pemeriksaan…"></textarea>
         <div class="report-form-actions"><button id="report-save" type="submit" disabled>Simpan di perangkat</button><button class="secondary" type="reset">Kosongkan</button></div>
       </fieldset></form>
@@ -76,11 +103,75 @@ async function mountReports(root) {
   const form = $('#report-form'), fields = $('#report-fields'), save = $('#report-save'), list = $('#reports-list');
   const preview = $('#report-preview'), previewWrap = $('#report-preview-wrap'), status = $('#report-status');
   let database, reports = [], photo, previewURL, selection = 0, decoding = false, busy = false;
+  let point = null, picker, pointMarker, pickerBoundary, boundaryLayer, mapResize;
   const cardURLs = new Set(), downloadURLs = new Set();
   const feedback = (message, error = false) => { status.textContent = message; status.classList.toggle('is-error', error); };
   const updateSave = () => { save.disabled = !database || !photo || decoding || busy; };
   const currentWita = () => new Date(Date.now() + 8 * 3600000).toISOString().slice(0, 16);
   $('#report-observed').value = currentWita();
+  const pointRelation = coordinates => pickerBoundary ? `${insideBoundary([coordinates.longitude, coordinates.latitude], pickerBoundary) ? 'Di dalam' : 'Di luar'} batas AOI KHDTK` : 'Batas AOI belum dimuat';
+  function updatePointSummary() {
+    $('#report-point-summary').textContent = point ? `${point.latitude.toFixed(6)}, ${point.longitude.toFixed(6)} · WGS 84 · ${pointRelation(point)}` : 'Belum ada titik dipilih.';
+    $('#report-point-summary').classList.toggle('has-point', Boolean(point));
+    $('#report-clear-point').disabled = !point;
+  }
+  function selectPoint(latlng) {
+    if (busy) return;
+    // Leaflet allows world wrapping. Store the equivalent longitude in WGS 84.
+    const wrapped = latlng.wrap();
+    point = validateCoordinates({ latitude: Number(wrapped.lat.toFixed(6)), longitude: Number(wrapped.lng.toFixed(6)) });
+    if (!pointMarker) {
+      pointMarker = L.marker([point.latitude, point.longitude], {
+        draggable: true, title: 'Titik pengamatan. Geser untuk mengubah lokasi.',
+        icon: L.divIcon({ className: 'report-point-marker', html: '<span></span>', iconSize: [24, 24], iconAnchor: [12, 12] })
+      }).addTo(picker);
+      pointMarker.on('dragend', () => selectPoint(pointMarker.getLatLng()));
+    } else pointMarker.setLatLng([point.latitude, point.longitude]);
+    updatePointSummary();
+  }
+  function clearPoint() {
+    point = null;
+    if (pointMarker) picker.removeLayer(pointMarker);
+    pointMarker = null; updatePointSummary();
+  }
+  async function setupPicker() {
+    const mapStatus = $('#report-map-status');
+    try {
+      if (!window.L) throw new Error('Pustaka peta gagal dimuat. Muat ulang halaman untuk memilih titik.');
+      picker = L.map($('#report-map'), { scrollWheelZoom: false, zoomControl: true, keyboard: true, maxZoom: 19 }).setView([-0.449, 117.215], 15);
+      const streets = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>' });
+      const satellite = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', { maxZoom: 19, attribution: 'Tiles &copy; Esri — Esri, Maxar, Earthstar Geographics, GIS User Community' }).addTo(picker);
+      L.control.layers({ 'Citra satelit': satellite, 'Peta jalan': streets }, {}, { collapsed: false }).addTo(picker);
+      L.control.scale({ imperial: false }).addTo(picker);
+      const tileError = () => { mapStatus.textContent = 'Sebagian peta dasar gagal dimuat. Coba ganti lapisan peta atau muat ulang halaman.'; };
+      for (const base of [streets, satellite]) base.on('tileerror', () => { if (picker.hasLayer(base)) tileError(); });
+      picker.on('click', event => selectPoint(event.latlng));
+      $('#report-use-center').disabled = false;
+      $('#report-use-center').addEventListener('click', () => selectPoint(picker.getCenter()));
+      $('#report-clear-point').addEventListener('click', clearPoint);
+      $('#report-fit-boundary').addEventListener('click', () => { if (boundaryLayer) picker.fitBounds(boundaryLayer.getBounds(), { padding: [20, 20], maxZoom: 16 }); });
+      if (typeof ResizeObserver !== 'undefined') {
+        mapResize = new ResizeObserver(() => picker.invalidateSize({ pan: false })); mapResize.observe($('#report-map'));
+      }
+      mapStatus.textContent = 'Memuat batas KHDTK…';
+      try {
+        const response = await fetch('data/boundary.geojson', { cache: 'no-cache', signal: AbortSignal.timeout(20000) });
+        if (!response.ok) throw new Error('Batas KHDTK gagal dimuat.');
+        pickerBoundary = await response.json();
+        boundaryLayer = L.geoJSON(pickerBoundary, { style: { color: '#b32624', weight: 3, fill: false }, interactive: false }).addTo(picker);
+        if (!boundaryLayer.getBounds().isValid()) throw new Error('Batas KHDTK tidak valid.');
+        if (!point) picker.fitBounds(boundaryLayer.getBounds(), { padding: [20, 20], maxZoom: 16 });
+        $('#report-fit-boundary').disabled = false;
+        mapStatus.textContent = 'Garis merah menunjukkan batas KHDTK. Peta dapat digeser ke lokasi pengamatan.';
+        updatePointSummary(); renderReports();
+      } catch {
+        pickerBoundary = undefined;
+        mapStatus.textContent = 'Batas KHDTK belum tersedia. Anda tetap dapat memilih titik pada peta; muat ulang untuk mencoba memuat batas.';
+      }
+    } catch (error) { mapStatus.textContent = error.message || 'Peta lokasi belum tersedia. Muat ulang halaman untuk mencoba lagi.'; }
+  }
+  // Keep map loading independent of IndexedDB: saved reports remain accessible if map loading fails.
+  void setupPicker();
   function clearPreview() {
     photo = undefined;
     if (previewURL) URL.revokeObjectURL(previewURL);
@@ -111,7 +202,7 @@ async function mountReports(root) {
     }
   });
   form.addEventListener('reset', () => {
-    ++selection; decoding = false; clearPreview();
+    ++selection; decoding = false; clearPreview(); clearPoint();
     queueMicrotask(() => { $('#report-observed').value = currentWita(); });
   });
   form.addEventListener('submit', async event => {
@@ -120,8 +211,8 @@ async function mountReports(root) {
     try {
       if (!database) throw new Error('Penyimpanan belum tersedia. Laporan belum disimpan.');
       validatePhoto(photo);
-      const data = validateReport(Object.fromEntries(new FormData(form)));
-      const report = { ...data, id: crypto.randomUUID(), createdAt: new Date().toISOString(), photo };
+      const data = validateReport({ ...Object.fromEntries(new FormData(form)), ...point });
+      const report = { ...data, ...(pickerBoundary ? { insideAOI: insideBoundary([data.longitude, data.latitude], pickerBoundary) } : {}), id: crypto.randomUUID(), createdAt: new Date().toISOString(), photo };
       busy = true; fields.disabled = true; updateSave(); feedback('Menyimpan foto dan laporan…');
       await transaction(database, 'readwrite', store => store.add(report));
       reports.unshift(report); renderReports(); form.reset();
@@ -146,10 +237,18 @@ async function mountReports(root) {
       const card = node('article', 'report-card'), image = node('img');
       image.src = URL.createObjectURL(report.photo); cardURLs.add(image.src); image.alt = `Foto: ${report.title}`; image.loading = 'lazy';
       const body = node('div', 'report-card-body');
-      body.append(node('p', 'report-card-date', formatObserved(report.observedAt)), node('h4', '', report.title), node('p', 'report-card-location', report.location));
+      const coordinates = savedPoint(report);
+      const locationText = coordinates ? `${coordinates.latitude.toFixed(6)}, ${coordinates.longitude.toFixed(6)} · WGS 84${pickerBoundary ? ` · ${pointRelation(coordinates)}` : ''}` : `${report.location || 'Lokasi belum tersedia'} · Laporan lama`;
+      body.append(node('p', 'report-card-date', formatObserved(report.observedAt)), node('h4', '', report.title), node('p', 'report-card-location', locationText));
       if (report.notes) body.append(node('p', 'report-card-notes', report.notes));
       const actions = node('div', 'report-card-actions'), download = node('button', 'secondary', '↓ Unduh HTML'), remove = node('button', 'report-delete', 'Hapus');
-      download.type = remove.type = 'button'; actions.append(download, remove);
+      download.type = remove.type = 'button';
+      if (coordinates) {
+        const showPoint = node('button', 'secondary', 'Lihat titik di peta'); showPoint.type = 'button';
+        showPoint.addEventListener('click', () => document.dispatchEvent(new CustomEvent('report:show', { detail: { report: { id: report.id, title: report.title, observedAt: report.observedAt, ...coordinates } } })));
+        actions.append(showPoint);
+      }
+      actions.append(download, remove);
       const confirm = node('div', 'report-confirm'); confirm.hidden = true;
       const yes = node('button', 'report-confirm-yes', 'Ya, hapus'), cancel = node('button', 'secondary', 'Batal');
       yes.type = cancel.type = 'button'; confirm.append(node('p', '', 'Hapus laporan ini dari perangkat?'), yes, cancel);
@@ -185,7 +284,7 @@ async function mountReports(root) {
     reports = (await transaction(database, 'readonly', store => store.getAll())).sort((a, b) => b.createdAt.localeCompare(a.createdAt));
     renderReports(); updateSave(); feedback('Penyimpanan perangkat siap. Laporan Anda tidak otomatis dikirim ke tim.');
   } catch (error) { database?.close(); database = undefined; updateSave(); feedback(`Penyimpanan perangkat tidak tersedia. ${error.message || 'Periksa pengaturan browser lalu muat ulang.'} Foto dan isian belum disimpan.`, true); }
-  window.addEventListener('pagehide', event => { if (event.persisted) return; if (previewURL) URL.revokeObjectURL(previewURL); cardURLs.forEach(url => URL.revokeObjectURL(url)); downloadURLs.forEach(url => URL.revokeObjectURL(url)); database?.close(); });
+  window.addEventListener('pagehide', event => { if (event.persisted) return; if (previewURL) URL.revokeObjectURL(previewURL); cardURLs.forEach(url => URL.revokeObjectURL(url)); downloadURLs.forEach(url => URL.revokeObjectURL(url)); database?.close(); mapResize?.disconnect(); picker?.remove(); });
 }
 
 if (typeof document !== 'undefined') {

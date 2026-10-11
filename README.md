@@ -4,15 +4,17 @@ WebGIS **KHDTK Diklathut Fahutan Unmul Lempake** dengan batas dari berkas penggu
 
 **Situs:** https://briaanmartin.github.io/KHDTK-FireWatch/
 
+**Profil & post pengantar:** https://briaanmartin.github.io/profile.github.io/#post — pengunjung dapat membaca post FireWatch pada profil Brian Martin, lalu membuka WebGIS. Tautan kembali ke profil tersedia di bagian atas dan footer WebGIS.
+
 ## Fitur
 
 - Header merah dan peta interaktif Leaflet, peta jalan OpenStreetMap serta citra Esri World Imagery sebagai tampilan awal.
-- Tampilan fokus pada AOI SHP: citra di luar poligon ditutup, pergeseran peta dibatasi di sekitar AOI, dan tombol Fokus AOI mengembalikan seluruh kawasan ke layar.
+- Peta dapat dijelajahi bebas dengan garis batas merah SHP, tanpa penutup citra di luar kawasan atau pembatasan pergeseran/zoom. Tombol Lihat batas mengembalikan kawasan ke layar.
 - NASA FIRMS VIIRS S-NPP, NOAA-20 dan NOAA-21, maksimum 7 hari berjalan. Peta, ringkasan, dan tabel menampilkan deteksi **di dalam AOI KHDTK saja**.
 - Filter 24/48 jam/7 hari dan kepercayaan deteksi.
 - Popup, tabel, jarak batas, waktu WITA, FRP dalam MW, ekspor CSV dan unduh GeoJSON.
 - Sumber yang gagal dibedakan dari sumber yang berhasil tanpa deteksi. Catatan lama yang masih relevan dipertahankan dan ditandai.
-- Bagian foto laporan lapangan: foto, waktu WITA, lokasi/blok, catatan, galeri perangkat, dan unduh laporan HTML beserta foto.
+- Bagian foto laporan lapangan: foto, waktu WITA, titik lokasi yang dipilih pada peta, catatan, galeri perangkat, dan unduh laporan HTML beserta foto dan koordinat.
 - Riwayat tahunan dalam AOI: grafik bulanan, cakupan arsip per satelit, jumlah deteksi tersimpan, hari dengan deteksi, detail bulanan, dan ekspor CSV. Bulan tanpa arsip ditandai belum tersedia.
 - Catatan pencegahan dan dampak karhutla tahun 2026 dengan tautan sumber resmi; informasi kegiatan tidak dihitung sebagai kejadian api dalam AOI.
 
@@ -20,7 +22,7 @@ WebGIS **KHDTK Diklathut Fahutan Unmul Lempake** dengan batas dari berkas penggu
 
 `AOI KRUS.shp` dipakai sebagai poligon utama. CRS asal **DGN95 / UTM zone 50S (EPSG:23880)** ditransformasikan ke **WGS84 (EPSG:4326)** dengan urutan GeoJSON `[longitude, latitude]`. Luas geodesik **313,8291 ha**. Transformasi memiliki akurasi yang dilaporkan PROJ 1 m; itu bukan pernyataan akurasi survei sumber.
 
-`KHDTK .kml` memuat poligon lebih besar, **598,7504 ha**, yang melingkupi SHP dan tetap disimpan sebagai data pembanding. Peta fokus pada batas SHP saja. Luas merupakan hasil perhitungan berkas, bukan penetapan resmi. Berkas asli tidak disalin ke repository. Metadata dan tiga penanda KML tersedia dalam `data/boundary-info.json`.
+`KHDTK .kml` memuat poligon lebih besar, **598,7504 ha**, yang melingkupi SHP dan tetap disimpan sebagai data pembanding. Garis batas pada peta menggunakan SHP; citra di sekitarnya tetap terlihat. Luas merupakan hasil perhitungan berkas, bukan penetapan resmi. Berkas asli tidak disalin ke repository. Metadata dan tiga penanda KML tersedia dalam `data/boundary-info.json`.
 
 Konversi ulang (opsional; tidak diperlukan oleh situs atau updater):
 
@@ -76,6 +78,8 @@ Catatan sumber publik tahun 2026 berasal dari [SRUK](https://srukindonesia.kemen
 Foto JPEG, PNG, atau WebP (maksimum 10 MB) dan catatan disimpan menggunakan IndexedDB di browser/perangkat yang dipakai. Laporan tidak dikirim ke server, repository, atau anggota tim. Gunakan unduh laporan HTML untuk menyimpan salinan beserta foto atau membagikannya sendiri. Data browser dapat hilang jika penyimpanan situs dihapus; lakukan ekspor untuk salinan arsip. Alamat localhost dan GitHub Pages mempunyai penyimpanan berbeda.
 
 Galeri awal kosong. Tidak ada foto lapangan buatan atau foto contoh yang disajikan sebagai laporan nyata.
+
+Lokasi laporan baru dipilih dengan klik/ketuk pada peta, lalu dapat dikoreksi dengan menggeser penanda. Pengguna keyboard dapat menggeser peta memakai tombol panah dan memilih **Gunakan tengah peta**. Koordinat WGS 84 dan status di dalam/di luar batas SHP disimpan bersama laporan serta disertakan dalam unduhan. Tombol **Lihat titik di peta** pada laporan tersimpan membuka lokasi tersebut di peta utama. Laporan lama yang hanya berisi teks lokasi tetap dapat dibaca dan diekspor.
 
 ## Menjalankan dan menguji
 

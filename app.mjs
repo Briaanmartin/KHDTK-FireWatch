@@ -8,7 +8,7 @@ const dateFormat = new Intl.DateTimeFormat('id-ID', {timeZone:'Asia/Makassar',da
 const number = value => new Intl.NumberFormat('id-ID',{maximumFractionDigits:2}).format(value);
 const dateText = value => value && Number.isFinite(Date.parse(value)) ? dateFormat.format(new Date(value)) : 'Belum tersedia';
 const escapeHTML = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-let map, boundary, info, boundaryLayer, hotspotLayer, currentBase, historyMarker;
+let map, boundary, info, boundaryLayer, hotspotLayer, currentBase, historyMarker, reportMarker;
 let detections = [], visible = [], status, dataLoaded = false, pageSize = 50, loading = false;
 const markerById = new Map();
 
@@ -23,7 +23,7 @@ function notice(message, tone = '') {
 }
 function setupMap() {
   if (!window.L) throw new Error('Pustaka peta gagal dimuat. Silakan muat ulang halaman.');
-  map = L.map('map',{zoomControl:false,preferCanvas:false,zoomSnap:.25,scrollWheelZoom:false,maxBoundsViscosity:1});
+  map = L.map('map',{zoomControl:false,preferCanvas:false,zoomSnap:.25,scrollWheelZoom:false});
   L.control.zoom({position:'topright'}).addTo(map);
   L.control.scale({imperial:false,position:'bottomleft'}).addTo(map);
   const bases = {
@@ -37,24 +37,15 @@ function setupMap() {
   $('basemap').addEventListener('change',()=>{
     map.removeLayer(currentBase); currentBase = bases[$('basemap').value].addTo(map); $('tile-notice').hidden=true;
   });
-  boundaryLayer = L.geoJSON(boundary,{style:{color:'#3d7033',weight:3,fillColor:'#8cbd5f',fillOpacity:.22}}).addTo(map);
+  boundaryLayer = L.geoJSON(boundary,{style:{color:'#d43830',weight:3,fill:false}}).addTo(map);
   boundaryLayer.bindPopup(`<span class="popup-label">BATAS DARI SHP</span><br><strong>${NAME}</strong><br>Luas geodesik: ${number(info.areaHa)} ha<br>DGN95 / UTM 50S → WGS 84`);
   boundaryLayer.bindTooltip('Batas KHDTK Lempake');
-  // Mask the basemap outside the supplied SHP; the primary AOI remains unchanged.
-  map.createPane('aoi-mask');map.getPane('aoi-mask').style.zIndex=350;
-  const outer=[[-85,-180],[-85,180],[85,180],[85,-180]];
-  const holes=boundary.features.flatMap(f=>(f.geometry.type==='Polygon'?[f.geometry.coordinates]:f.geometry.coordinates).map(p=>p[0].map(([lon,lat])=>[lat,lon])));
-  L.polygon([outer,...holes],{pane:'aoi-mask',stroke:false,fillColor:'#f3f5f0',fillOpacity:1,interactive:false}).addTo(map);
   const areaBounds=boundaryLayer.getBounds();
-  map.setMaxBounds(areaBounds.pad(.2));
-  const focusAOI=()=>{
-    map.setMinZoom(map.getBoundsZoom(areaBounds,false,L.point(32,32)));
-    map.fitBounds(areaBounds,{padding:[16,16],animate:false});
-  };
+  const showBoundary=()=>map.fitBounds(areaBounds.pad(.35),{padding:[24,24],animate:false});
   hotspotLayer = L.featureGroup().addTo(map);
   const toggle = (id,layer) => $(id).addEventListener('change',()=>$(id).checked ? layer.addTo(map) : map.removeLayer(layer));
   toggle('show-boundary',boundaryLayer);toggle('show-hotspots',hotspotLayer);
-  $('fit-boundary').addEventListener('click',focusAOI);
+  $('fit-boundary').addEventListener('click',()=>{$('show-boundary').checked=true;boundaryLayer.addTo(map);showBoundary();});
   document.addEventListener('history:show', event=>{
     const feature=event.detail?.feature;
     if(feature?.geometry?.type!=='Point' || !insideBoundary(feature.geometry.coordinates,boundary)) return;
@@ -64,17 +55,29 @@ function setupMap() {
     historyMarker=L.circleMarker([lat,lon],{radius:10,color:'#8d201e',weight:3,fillColor:'#f39c5b',fillOpacity:.9}).addTo(map);
     historyMarker.bindPopup(`<span class="popup-label">DETEKSI ARSIP TAHUNAN</span><br><strong>${escapeHTML(p.satellite)}</strong><br>${dateText(p.detected_at)} WITA<br>Di dalam AOI KHDTK<br>Kepercayaan: ${labels[normalizeConfidence(p.confidence)]}<br>FRP: ${Number.isFinite(p.frp)?number(p.frp)+' MW':'Tidak tersedia'}<br>${lat.toFixed(5)}, ${lon.toFixed(5)}<br><small>Deteksi satelit; perlu verifikasi kejadian api.</small>`);
     historyMarker.on('popupclose',()=>{if(historyMarker){map.removeLayer(historyMarker);historyMarker=null;}});
-    focusAOI();historyMarker.openPopup();$('map').scrollIntoView({behavior:'smooth',block:'center'});
+    map.setView([lat,lon],15);historyMarker.openPopup();$('map').scrollIntoView({behavior:'smooth',block:'center'});
+  });
+  document.addEventListener('report:show', event=>{
+    const report=event.detail?.report;
+    const lat=report?.latitude,lon=report?.longitude;
+    if(!Number.isFinite(lat)||!Number.isFinite(lon)||Math.abs(lat)>90||Math.abs(lon)>180) return;
+    if(reportMarker) map.removeLayer(reportMarker);
+    const marker=L.marker([lat,lon],{title:'Titik laporan lapangan',icon:L.divIcon({className:'report-point-marker',html:'<span></span>',iconSize:[24,24],iconAnchor:[12,12]})}).addTo(map);
+    reportMarker=marker;
+    const place=insideBoundary([lon,lat],boundary)?'Di dalam batas KHDTK':'Di luar batas KHDTK';
+    marker.bindPopup(`<span class="popup-label">TITIK LAPORAN LAPANGAN</span><br><strong>${escapeHTML(report.title)}</strong><br>${dateText(`${report.observedAt}:00+08:00`)} WITA<br>${place}<br>${lat.toFixed(6)}, ${lon.toFixed(6)}<br><small>Lokasi dipilih pelapor · tersimpan di perangkat ini.</small>`);
+    marker.on('popupclose',()=>{map.removeLayer(marker);if(reportMarker===marker) reportMarker=null;});
+    map.setView([lat,lon],16);marker.openPopup();$('map').scrollIntoView({behavior:'smooth',block:'center'});
   });
   $('fit-hotspots').addEventListener('click',()=>{
     if (!hotspotLayer.getLayers().length) return;
     $('show-hotspots').checked=true;hotspotLayer.addTo(map);
-    focusAOI();
+    map.fitBounds(hotspotLayer.getBounds(),{padding:[40,40],maxZoom:16});
   });
   map.on('mousemove',event=>{$('coordinates').textContent=`${event.latlng.lat.toFixed(5)}, ${event.latlng.lng.toFixed(5)} · WGS 84`;});
   map.on('mouseout',()=>{$('coordinates').textContent='WGS 84 · EPSG:4326';});
-  new ResizeObserver(()=>{map.invalidateSize();focusAOI();}).observe($('map'));
-  focusAOI();
+  new ResizeObserver(()=>map.invalidateSize({pan:false})).observe($('map'));
+  showBoundary();
 }
 function prepareDetections(collection) {
   if (collection.type !== 'FeatureCollection' || !Array.isArray(collection.features)) throw new Error('Format data hotspot tidak valid.');
@@ -88,7 +91,7 @@ function prepareDetections(collection) {
 function renderStatus() {
   const checked = Date.parse(status?.checked_at), age = Date.now() - checked;
   const stale = !Number.isFinite(checked) || age > 6*3600000;
-  let label='Data NASA FIRMS', tone='', message='Peta dan daftar hotspot difokuskan pada AOI KHDTK dari batas SHP. Data NASA FIRMS diperbarui setiap jam; pengamatan mengikuti lintasan satelit.';
+  let label='Data NASA FIRMS', tone='', message='Garis merah menunjukkan batas KHDTK. Peta dapat dijelajahi bebas; ringkasan dan daftar hotspot dihitung di dalam AOI. Data NASA FIRMS diperbarui setiap jam sesuai pengamatan satelit.';
   if (status?.state==='error') { label='Sumber belum tersedia';tone='error';message='Pengambilan data hotspot gagal. Jika tersedia, catatan terakhir tetap ditampilkan dengan status data lama. Kondisi kawasan belum dapat disimpulkan dari data ini.'; }
   else if (status?.state==='partial') { label='Sebagian sumber tersedia';tone='warn';message='Sebagian sumber NASA FIRMS gagal diperbarui. Catatan tersimpan dari sumber tersebut ditandai sebagai data lama; cakupan pengamatan belum lengkap.'; }
   else if (stale) { label='Data perlu diperbarui';tone='warn';message='Pembaruan data terakhir sudah lebih dari 6 jam atau waktunya tidak tersedia. Tabel tetap menampilkan catatan dalam periode pilihan; periksa waktu pengamatan.'; }
@@ -170,7 +173,7 @@ async function start() {
   try {
     [boundary,info]=await Promise.all([json('data/boundary.geojson'),json('data/boundary-info.json')]);
     $('area-stat').textContent=number(info.areaHa);
-    $('boundary-description').textContent=`AOI utama berasal dari AOI KRUS.shp, dengan luas geodesik ${number(info.areaHa)} ha. Proyeksi DGN95 / UTM Zona 50S (EPSG:23880) dikonversi ke WGS 84. Tampilan peta dibatasi pada poligon SHP; KML tetap tersimpan sebagai data pembanding.`;
+    $('boundary-description').textContent=`AOI utama berasal dari AOI KRUS.shp, dengan luas geodesik ${number(info.areaHa)} ha. Proyeksi DGN95 / UTM Zona 50S (EPSG:23880) dikonversi ke WGS 84. Garis merah menandai batas SHP pada peta yang dapat dijelajahi bebas; KML tetap tersimpan sebagai data pembanding.`;
     setupMap();
     ['period','confidence'].forEach(id=>$(id).addEventListener('change',()=>{pageSize=50;render();}));
     $('reset').addEventListener('click',()=>{$('period').value='168';$('scope').value='inside';$('confidence').value='all';pageSize=50;render();});
