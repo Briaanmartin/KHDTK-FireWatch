@@ -3,7 +3,7 @@
   "schema_version": 1,
   "year": 2026,
   "timezone": "Asia/Makassar",
-  "generated_at": "2026-10-18T11:25:15Z",
+  "generated_at": "2026-10-18T15:59:47Z",
   "boundary_sha256": "0f8a46ababa6f65d6842ac10bbad853592aa0e6e9b98b67be93c53d2fe859ca9",
   "features": [],
   "sources": [
@@ -49,7 +49,7 @@
         },
         {
           "start": "2026-10-04T15:18:38Z",
-          "end": "2026-10-18T11:25:01Z",
+          "end": "2026-10-18T15:59:44Z",
           "kind": "nrt",
           "reference": "https://firms.modaps.eosdis.nasa.gov/data/active_fire/suomi-npp-viirs-c2/csv/SUOMI_VIIRS_C2_SouthEast_Asia_7d.csv"
         }
@@ -104,7 +104,7 @@
         },
         {
           "start": "2026-10-04T15:18:38Z",
-          "end": "2026-10-18T11:25:01Z",
+          "end": "2026-10-18T15:59:44Z",
           "kind": "nrt",
           "reference": "https://firms.modaps.eosdis.nasa.gov/data/active_fire/noaa-20-viirs-c2/csv/J1_VIIRS_C2_SouthEast_Asia_7d.csv"
         }
@@ -159,7 +159,7 @@
         },
         {
           "start": "2026-10-04T15:18:38Z",
-          "end": "2026-10-18T11:25:01Z",
+          "end": "2026-10-18T15:59:44Z",
           "kind": "nrt",
           "reference": "https://firms.modaps.eosdis.nasa.gov/data/active_fire/noaa-21-viirs-c2/csv/J2_VIIRS_C2_SouthEast_Asia_7d.csv"
         }
