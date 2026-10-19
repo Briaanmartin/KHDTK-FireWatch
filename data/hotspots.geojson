@@ -1,13 +1,13 @@
 {
   "type": "FeatureCollection",
-  "generated_at": "2026-10-19T17:35:36Z",
+  "generated_at": "2026-10-19T22:29:45Z",
   "status": {
     "schema_version": 1,
-    "checked_at": "2026-10-19T17:35:36Z",
-    "state": "error",
-    "last_success_at": "2026-10-19T10:58:03Z",
-    "window_start": "2026-10-12T17:35:36Z",
-    "window_end": "2026-10-19T17:35:36Z",
+    "checked_at": "2026-10-19T22:29:45Z",
+    "state": "ready",
+    "last_success_at": "2026-10-19T22:29:45Z",
+    "window_start": "2026-10-12T22:29:45Z",
+    "window_end": "2026-10-19T22:29:45Z",
     "window_days": 7,
     "buffer_km": 25,
     "boundary_file": "boundary.geojson",
@@ -18,59 +18,88 @@
       -0.21247450265285364
     ],
     "distance_method": "Jarak sferis terpendek ke batas SHP; radius bumi 6371.0088 km.",
-    "feature_count": 81,
+    "feature_count": 82,
     "inside_count": 0,
-    "stale_count": 81,
-    "latest_detection_at": "2026-10-19T06:05:00Z",
+    "stale_count": 0,
+    "latest_detection_at": "2026-10-19T18:11:00Z",
     "sources": [
       {
         "id": "VIIRS_SNPP_NRT",
         "name": "VIIRS S-NPP",
         "satellite": "S-NPP",
         "url": "https://firms.modaps.eosdis.nasa.gov/data/active_fire/suomi-npp-viirs-c2/csv/SUOMI_VIIRS_C2_SouthEast_Asia_7d.csv",
-        "state": "error",
-        "error": "URLError: <urlopen error [Errno 101] Network is unreachable>",
-        "last_success_at": "2026-10-19T10:58:03Z",
-        "source_updated_at": "2026-10-19T10:49:12Z",
-        "latest_detection_at": "2026-10-19T07:46:00Z",
-        "regional_rows": null,
+        "state": "ready",
+        "last_success_at": "2026-10-19T22:29:45Z",
+        "source_updated_at": "2026-10-19T21:51:41Z",
+        "latest_detection_at": "2026-10-19T18:47:00Z",
+        "regional_rows": 77660,
         "feature_count": 26,
-        "retained_count": 26
+        "retained_count": 0,
+        "error": null
       },
       {
         "id": "VIIRS_NOAA20_NRT",
         "name": "VIIRS NOAA-20",
         "satellite": "NOAA-20",
         "url": "https://firms.modaps.eosdis.nasa.gov/data/active_fire/noaa-20-viirs-c2/csv/J1_VIIRS_C2_SouthEast_Asia_7d.csv",
-        "state": "error",
-        "error": "URLError: <urlopen error [Errno 101] Network is unreachable>",
-        "last_success_at": "2026-10-19T10:58:03Z",
-        "source_updated_at": "2026-10-19T10:42:20Z",
-        "latest_detection_at": "2026-10-19T08:13:00Z",
-        "regional_rows": null,
+        "state": "ready",
+        "last_success_at": "2026-10-19T22:29:45Z",
+        "source_updated_at": "2026-10-19T21:42:55Z",
+        "latest_detection_at": "2026-10-19T19:08:00Z",
+        "regional_rows": 95102,
         "feature_count": 32,
-        "retained_count": 32
+        "retained_count": 0,
+        "error": null
       },
       {
         "id": "VIIRS_NOAA21_NRT",
         "name": "VIIRS NOAA-21",
         "satellite": "NOAA-21",
         "url": "https://firms.modaps.eosdis.nasa.gov/data/active_fire/noaa-21-viirs-c2/csv/J2_VIIRS_C2_SouthEast_Asia_7d.csv",
-        "state": "error",
-        "error": "URLError: <urlopen error [Errno 101] Network is unreachable>",
-        "last_success_at": "2026-10-19T10:58:03Z",
-        "source_updated_at": "2026-10-19T10:44:48Z",
-        "latest_detection_at": "2026-10-18T20:04:00Z",
-        "regional_rows": null,
-        "feature_count": 23,
-        "retained_count": 23
+        "state": "ready",
+        "last_success_at": "2026-10-19T22:29:45Z",
+        "source_updated_at": "2026-10-19T21:46:14Z",
+        "latest_detection_at": "2026-10-19T18:13:00Z",
+        "regional_rows": 88912,
+        "feature_count": 24,
+        "retained_count": 0,
+        "error": null
       }
     ],
-    "message": "Pembaruan NASA FIRMS gagal. Data lama yang masih dalam 7 hari dipertahankan dan ditandai kedaluwarsa; kondisi terkini belum diketahui.",
+    "message": "Data NASA FIRMS berhasil diperbarui. Hotspot merupakan indikasi panas satelit dan perlu verifikasi lapangan.",
     "attribution": "NASA FIRMS / LANCE, VIIRS 375 m Near Real-Time, Collection 2",
     "source_documentation": "https://firms.modaps.eosdis.nasa.gov/active_fire/"
   },
   "features": [
+    {
+      "type": "Feature",
+      "id": "b7508bd6125c99dd558f",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          117.20346,
+          -0.60717
+        ]
+      },
+      "properties": {
+        "id": "b7508bd6125c99dd558f",
+        "detected_at": "2026-10-19T18:11:00Z",
+        "latitude": -0.60717,
+        "longitude": 117.20346,
+        "confidence": "nominal",
+        "satellite": "NOAA-21",
+        "instrument": "VIIRS",
+        "source": "VIIRS_NOAA21_NRT",
+        "frp": 1.1,
+        "brightness": 315.39,
+        "daynight": "N",
+        "scan_km": 0.34,
+        "track_km": 0.56,
+        "inside_aoi": false,
+        "distance_km": 16.52,
+        "stale": false
+      }
+    },
     {
       "type": "Feature",
       "id": "8917a0cdf8aabadb40d3",
@@ -97,7 +126,7 @@
         "track_km": 0.41,
         "inside_aoi": false,
         "distance_km": 5.133,
-        "stale": true
+        "stale": false
       }
     },
     {
@@ -126,7 +155,7 @@
         "track_km": 0.77,
         "inside_aoi": false,
         "distance_km": 24.906,
-        "stale": true
+        "stale": false
       }
     },
     {
@@ -155,7 +184,7 @@
         "track_km": 0.77,
         "inside_aoi": false,
         "distance_km": 24.995,
-        "stale": true
+        "stale": false
       }
     },
     {
@@ -184,7 +213,7 @@
         "track_km": 0.36,
         "inside_aoi": false,
         "distance_km": 9.621,
-        "stale": true
+        "stale": false
       }
     },
     {
@@ -213,7 +242,7 @@
         "track_km": 0.36,
         "inside_aoi": false,
         "distance_km": 9.725,
-        "stale": true
+        "stale": false
       }
     },
     {
@@ -242,7 +271,7 @@
         "track_km": 0.36,
         "inside_aoi": false,
         "distance_km": 24.851,
-        "stale": true
+        "stale": false
       }
     },
     {
@@ -271,7 +300,7 @@
         "track_km": 0.36,
         "inside_aoi": false,
         "distance_km": 8.845,
-        "stale": true
+        "stale": false
       }
     },
     {
@@ -300,7 +329,7 @@
         "track_km": 0.36,
         "inside_aoi": false,
         "distance_km": 4.984,
-        "stale": true
+        "stale": false
       }
     },
     {
@@ -329,7 +358,7 @@
         "track_km": 0.36,
         "inside_aoi": false,
         "distance_km": 22.511,
-        "stale": true
+        "stale": false
       }
     },
     {
@@ -358,7 +387,7 @@
         "track_km": 0.36,
         "inside_aoi": false,
         "distance_km": 18.534,
-        "stale": true
+        "stale": false
       }
     },
     {
@@ -387,7 +416,7 @@
         "track_km": 0.36,
         "inside_aoi": false,
         "distance_km": 5.348,
-        "stale": true
+        "stale": false
       }
     },
     {
@@ -416,7 +445,7 @@
         "track_km": 0.36,
         "inside_aoi": false,
         "distance_km": 18.85,
-        "stale": true
+        "stale": false
       }
     },
     {
@@ -445,7 +474,7 @@
         "track_km": 0.36,
         "inside_aoi": false,
         "distance_km": 8.809,
-        "stale": true
+        "stale": false
       }
     },
     {
@@ -474,7 +503,7 @@
         "track_km": 0.36,
         "inside_aoi": false,
         "distance_km": 23.019,
-        "stale": true
+        "stale": false
       }
     },
     {
@@ -503,7 +532,7 @@
         "track_km": 0.47,
         "inside_aoi": false,
         "distance_km": 9.005,
-        "stale": true
+        "stale": false
       }
     },
     {
@@ -532,7 +561,7 @@
         "track_km": 0.47,
         "inside_aoi": false,
         "distance_km": 8.515,
-        "stale": true
+        "stale": false
       }
     },
     {
@@ -561,7 +590,7 @@
         "track_km": 0.47,
         "inside_aoi": false,
         "distance_km": 5.303,
-        "stale": true
+        "stale": false
       }
     },
     {
@@ -590,7 +619,7 @@
         "track_km": 0.71,
         "inside_aoi": false,
         "distance_km": 8.659,
-        "stale": true
+        "stale": false
       }
     },
     {
@@ -619,7 +648,7 @@
         "track_km": 0.71,
         "inside_aoi": false,
         "distance_km": 8.787,
-        "stale": true
+        "stale": false
       }
     },
     {
@@ -648,7 +677,7 @@
         "track_km": 0.7,
         "inside_aoi": false,
         "distance_km": 22.956,
-        "stale": true
+        "stale": false
       }
     },
     {
@@ -677,7 +706,7 @@
         "track_km": 0.71,
         "inside_aoi": false,
         "distance_km": 8.717,
-        "stale": true
+        "stale": false
       }
     },
     {
@@ -706,7 +735,7 @@
         "track_km": 0.57,
         "inside_aoi": false,
         "distance_km": 24.135,
-        "stale": true
+        "stale": false
       }
     },
     {
@@ -735,7 +764,7 @@
         "track_km": 0.57,
         "inside_aoi": false,
         "distance_km": 24.105,
-        "stale": true
+        "stale": false
       }
     },
     {
@@ -764,7 +793,7 @@
         "track_km": 0.39,
         "inside_aoi": false,
         "distance_km": 9.999,
-        "stale": true
+        "stale": false
       }
     },
     {
@@ -793,7 +822,7 @@
         "track_km": 0.39,
         "inside_aoi": false,
         "distance_km": 9.626,
-        "stale": true
+        "stale": false
       }
     },
     {
@@ -822,7 +851,7 @@
         "track_km": 0.39,
         "inside_aoi": false,
         "distance_km": 24.299,
-        "stale": true
+        "stale": false
       }
     },
     {
@@ -851,7 +880,7 @@
         "track_km": 0.39,
         "inside_aoi": false,
         "distance_km": 9.427,
-        "stale": true
+        "stale": false
       }
     },
     {
@@ -880,7 +909,7 @@
         "track_km": 0.39,
         "inside_aoi": false,
         "distance_km": 9.618,
-        "stale": true
+        "stale": false
       }
     },
     {
@@ -909,7 +938,7 @@
         "track_km": 0.39,
         "inside_aoi": false,
         "distance_km": 9.792,
-        "stale": true
+        "stale": false
       }
     },
     {
@@ -938,7 +967,7 @@
         "track_km": 0.62,
         "inside_aoi": false,
         "distance_km": 7.087,
-        "stale": true
+        "stale": false
       }
     },
     {
@@ -967,7 +996,7 @@
         "track_km": 0.45,
         "inside_aoi": false,
         "distance_km": 24.99,
-        "stale": true
+        "stale": false
       }
     },
     {
@@ -996,7 +1025,7 @@
         "track_km": 0.37,
         "inside_aoi": false,
         "distance_km": 24.332,
-        "stale": true
+        "stale": false
       }
     },
     {
@@ -1025,7 +1054,7 @@
         "track_km": 0.37,
         "inside_aoi": false,
         "distance_km": 9.724,
-        "stale": true
+        "stale": false
       }
     },
     {
@@ -1054,7 +1083,7 @@
         "track_km": 0.55,
         "inside_aoi": false,
         "distance_km": 9.899,
-        "stale": true
+        "stale": false
       }
     },
     {
@@ -1083,7 +1112,7 @@
         "track_km": 0.42,
         "inside_aoi": false,
         "distance_km": 17.371,
-        "stale": true
+        "stale": false
       }
     },
     {
@@ -1112,7 +1141,7 @@
         "track_km": 0.42,
         "inside_aoi": false,
         "distance_km": 3.995,
-        "stale": true
+        "stale": false
       }
     },
     {
@@ -1141,7 +1170,7 @@
         "track_km": 0.42,
         "inside_aoi": false,
         "distance_km": 21.716,
-        "stale": true
+        "stale": false
       }
     },
     {
@@ -1170,7 +1199,7 @@
         "track_km": 0.42,
         "inside_aoi": false,
         "distance_km": 19.201,
-        "stale": true
+        "stale": false
       }
     },
     {
@@ -1199,7 +1228,7 @@
         "track_km": 0.42,
         "inside_aoi": false,
         "distance_km": 16.937,
-        "stale": true
+        "stale": false
       }
     },
     {
@@ -1228,7 +1257,7 @@
         "track_km": 0.38,
         "inside_aoi": false,
         "distance_km": 21.373,
-        "stale": true
+        "stale": false
       }
     },
     {
@@ -1257,7 +1286,7 @@
         "track_km": 0.38,
         "inside_aoi": false,
         "distance_km": 17.452,
-        "stale": true
+        "stale": false
       }
     },
     {
@@ -1286,7 +1315,7 @@
         "track_km": 0.38,
         "inside_aoi": false,
         "distance_km": 17.056,
-        "stale": true
+        "stale": false
       }
     },
     {
@@ -1315,7 +1344,7 @@
         "track_km": 0.55,
         "inside_aoi": false,
         "distance_km": 17.402,
-        "stale": true
+        "stale": false
       }
     },
     {
@@ -1344,7 +1373,7 @@
         "track_km": 0.74,
         "inside_aoi": false,
         "distance_km": 16.643,
-        "stale": true
+        "stale": false
       }
     },
     {
@@ -1373,7 +1402,7 @@
         "track_km": 0.74,
         "inside_aoi": false,
         "distance_km": 9.657,
-        "stale": true
+        "stale": false
       }
     },
     {
@@ -1402,7 +1431,7 @@
         "track_km": 0.74,
         "inside_aoi": false,
         "distance_km": 16.618,
-        "stale": true
+        "stale": false
       }
     },
     {
@@ -1431,7 +1460,7 @@
         "track_km": 0.51,
         "inside_aoi": false,
         "distance_km": 16.993,
-        "stale": true
+        "stale": false
       }
     },
     {
@@ -1460,7 +1489,7 @@
         "track_km": 0.51,
         "inside_aoi": false,
         "distance_km": 16.804,
-        "stale": true
+        "stale": false
       }
     },
     {
@@ -1489,7 +1518,7 @@
         "track_km": 0.51,
         "inside_aoi": false,
         "distance_km": 9.504,
-        "stale": true
+        "stale": false
       }
     },
     {
@@ -1518,7 +1547,7 @@
         "track_km": 0.51,
         "inside_aoi": false,
         "distance_km": 9.819,
-        "stale": true
+        "stale": false
       }
     },
     {
@@ -1547,7 +1576,7 @@
         "track_km": 0.51,
         "inside_aoi": false,
         "distance_km": 16.47,
-        "stale": true
+        "stale": false
       }
     },
     {
@@ -1576,7 +1605,7 @@
         "track_km": 0.46,
         "inside_aoi": false,
         "distance_km": 17.766,
-        "stale": true
+        "stale": false
       }
     },
     {
@@ -1605,7 +1634,7 @@
         "track_km": 0.46,
         "inside_aoi": false,
         "distance_km": 16.725,
-        "stale": true
+        "stale": false
       }
     },
     {
@@ -1634,7 +1663,7 @@
         "track_km": 0.46,
         "inside_aoi": false,
         "distance_km": 16.438,
-        "stale": true
+        "stale": false
       }
     },
     {
@@ -1663,7 +1692,7 @@
         "track_km": 0.46,
         "inside_aoi": false,
         "distance_km": 22.686,
-        "stale": true
+        "stale": false
       }
     },
     {
@@ -1692,7 +1721,7 @@
         "track_km": 0.46,
         "inside_aoi": false,
         "distance_km": 16.852,
-        "stale": true
+        "stale": false
       }
     },
     {
@@ -1721,7 +1750,7 @@
         "track_km": 0.46,
         "inside_aoi": false,
         "distance_km": 16.309,
-        "stale": true
+        "stale": false
       }
     },
     {
@@ -1750,7 +1779,7 @@
         "track_km": 0.7,
         "inside_aoi": false,
         "distance_km": 22.418,
-        "stale": true
+        "stale": false
       }
     },
     {
@@ -1779,7 +1808,7 @@
         "track_km": 0.58,
         "inside_aoi": false,
         "distance_km": 12.409,
-        "stale": true
+        "stale": false
       }
     },
     {
@@ -1808,7 +1837,7 @@
         "track_km": 0.38,
         "inside_aoi": false,
         "distance_km": 18.709,
-        "stale": true
+        "stale": false
       }
     },
     {
@@ -1837,7 +1866,7 @@
         "track_km": 0.38,
         "inside_aoi": false,
         "distance_km": 17.207,
-        "stale": true
+        "stale": false
       }
     },
     {
@@ -1866,7 +1895,7 @@
         "track_km": 0.38,
         "inside_aoi": false,
         "distance_km": 12.239,
-        "stale": true
+        "stale": false
       }
     },
     {
@@ -1895,7 +1924,7 @@
         "track_km": 0.38,
         "inside_aoi": false,
         "distance_km": 19.299,
-        "stale": true
+        "stale": false
       }
     },
     {
@@ -1924,7 +1953,7 @@
         "track_km": 0.38,
         "inside_aoi": false,
         "distance_km": 16.951,
-        "stale": true
+        "stale": false
       }
     },
     {
@@ -1953,7 +1982,7 @@
         "track_km": 0.38,
         "inside_aoi": false,
         "distance_km": 19.019,
-        "stale": true
+        "stale": false
       }
     },
     {
@@ -1982,7 +2011,7 @@
         "track_km": 0.38,
         "inside_aoi": false,
         "distance_km": 17.534,
-        "stale": true
+        "stale": false
       }
     },
     {
@@ -2011,7 +2040,7 @@
         "track_km": 0.4,
         "inside_aoi": false,
         "distance_km": 19.077,
-        "stale": true
+        "stale": false
       }
     },
     {
@@ -2040,7 +2069,7 @@
         "track_km": 0.4,
         "inside_aoi": false,
         "distance_km": 17.371,
-        "stale": true
+        "stale": false
       }
     },
     {
@@ -2069,7 +2098,7 @@
         "track_km": 0.7,
         "inside_aoi": false,
         "distance_km": 18.57,
-        "stale": true
+        "stale": false
       }
     },
     {
@@ -2098,7 +2127,7 @@
         "track_km": 0.7,
         "inside_aoi": false,
         "distance_km": 9.663,
-        "stale": true
+        "stale": false
       }
     },
     {
@@ -2127,7 +2156,7 @@
         "track_km": 0.7,
         "inside_aoi": false,
         "distance_km": 9.584,
-        "stale": true
+        "stale": false
       }
     },
     {
@@ -2156,7 +2185,7 @@
         "track_km": 0.36,
         "inside_aoi": false,
         "distance_km": 18.391,
-        "stale": true
+        "stale": false
       }
     },
     {
@@ -2185,7 +2214,7 @@
         "track_km": 0.36,
         "inside_aoi": false,
         "distance_km": 18.736,
-        "stale": true
+        "stale": false
       }
     },
     {
@@ -2214,7 +2243,7 @@
         "track_km": 0.36,
         "inside_aoi": false,
         "distance_km": 9.573,
-        "stale": true
+        "stale": false
       }
     },
     {
@@ -2243,7 +2272,7 @@
         "track_km": 0.36,
         "inside_aoi": false,
         "distance_km": 23.034,
-        "stale": true
+        "stale": false
       }
     },
     {
@@ -2272,7 +2301,7 @@
         "track_km": 0.37,
         "inside_aoi": false,
         "distance_km": 18.479,
-        "stale": true
+        "stale": false
       }
     },
     {
@@ -2301,7 +2330,7 @@
         "track_km": 0.36,
         "inside_aoi": false,
         "distance_km": 5.229,
-        "stale": true
+        "stale": false
       }
     },
     {
@@ -2330,7 +2359,7 @@
         "track_km": 0.52,
         "inside_aoi": false,
         "distance_km": 18.964,
-        "stale": true
+        "stale": false
       }
     },
     {
@@ -2359,7 +2388,7 @@
         "track_km": 0.52,
         "inside_aoi": false,
         "distance_km": 18.455,
-        "stale": true
+        "stale": false
       }
     },
     {
@@ -2388,7 +2417,7 @@
         "track_km": 0.52,
         "inside_aoi": false,
         "distance_km": 18.734,
-        "stale": true
+        "stale": false
       }
     },
     {
@@ -2417,7 +2446,7 @@
         "track_km": 0.68,
         "inside_aoi": false,
         "distance_km": 17.916,
-        "stale": true
+        "stale": false
       }
     }
   ]
