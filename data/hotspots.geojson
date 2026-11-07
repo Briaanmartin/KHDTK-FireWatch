@@ -1,13 +1,13 @@
 {
   "type": "FeatureCollection",
-  "generated_at": "2026-11-07T20:20:01Z",
+  "generated_at": "2026-11-07T23:43:47Z",
   "status": {
     "schema_version": 1,
-    "checked_at": "2026-11-07T20:20:01Z",
+    "checked_at": "2026-11-07T23:43:47Z",
     "state": "partial",
     "last_success_at": "2026-11-04T06:43:43Z",
-    "window_start": "2026-10-31T20:20:01Z",
-    "window_end": "2026-11-07T20:20:01Z",
+    "window_start": "2026-10-31T23:43:47Z",
+    "window_end": "2026-11-07T23:43:47Z",
     "window_days": 7,
     "buffer_km": 25,
     "boundary_file": "boundary.geojson",
@@ -18,10 +18,10 @@
       -0.21247450265285364
     ],
     "distance_method": "Jarak sferis terpendek ke batas SHP; radius bumi 6371.0088 km.",
-    "feature_count": 65,
+    "feature_count": 66,
     "inside_count": 0,
     "stale_count": 1,
-    "latest_detection_at": "2026-11-07T17:11:00Z",
+    "latest_detection_at": "2026-11-07T18:10:00Z",
     "sources": [
       {
         "id": "VIIRS_SNPP_NRT",
@@ -43,11 +43,11 @@
         "satellite": "NOAA-20",
         "url": "https://firms.modaps.eosdis.nasa.gov/data/active_fire/noaa-20-viirs-c2/csv/J1_VIIRS_C2_SouthEast_Asia_7d.csv",
         "state": "ready",
-        "last_success_at": "2026-11-07T20:20:01Z",
-        "source_updated_at": "2026-11-07T19:42:38Z",
-        "latest_detection_at": "2026-11-07T16:32:00Z",
-        "regional_rows": 26559,
-        "feature_count": 28,
+        "last_success_at": "2026-11-07T23:43:47Z",
+        "source_updated_at": "2026-11-07T23:43:21Z",
+        "latest_detection_at": "2026-11-07T19:46:00Z",
+        "regional_rows": 27169,
+        "feature_count": 29,
         "retained_count": 0,
         "error": null
       },
@@ -57,10 +57,10 @@
         "satellite": "NOAA-21",
         "url": "https://firms.modaps.eosdis.nasa.gov/data/active_fire/noaa-21-viirs-c2/csv/J2_VIIRS_C2_SouthEast_Asia_7d.csv",
         "state": "ready",
-        "last_success_at": "2026-11-07T20:20:01Z",
-        "source_updated_at": "2026-11-07T19:45:31Z",
-        "latest_detection_at": "2026-11-07T17:15:00Z",
-        "regional_rows": 26141,
+        "last_success_at": "2026-11-07T23:43:47Z",
+        "source_updated_at": "2026-11-07T22:45:18Z",
+        "latest_detection_at": "2026-11-07T20:27:00Z",
+        "regional_rows": 26303,
         "feature_count": 36,
         "retained_count": 0,
         "error": null
@@ -71,6 +71,35 @@
     "source_documentation": "https://firms.modaps.eosdis.nasa.gov/active_fire/"
   },
   "features": [
+    {
+      "type": "Feature",
+      "id": "7ac2abf91d8eef0dc267",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          117.24087,
+          -0.48845
+        ]
+      },
+      "properties": {
+        "id": "7ac2abf91d8eef0dc267",
+        "detected_at": "2026-11-07T18:10:00Z",
+        "latitude": -0.48845,
+        "longitude": 117.24087,
+        "confidence": "nominal",
+        "satellite": "NOAA-20",
+        "instrument": "VIIRS",
+        "source": "VIIRS_NOAA20_NRT",
+        "frp": 0.95,
+        "brightness": 302.92,
+        "daynight": "N",
+        "scan_km": 0.52,
+        "track_km": 0.5,
+        "inside_aoi": false,
+        "distance_km": 3.971,
+        "stale": false
+      }
+    },
     {
       "type": "Feature",
       "id": "b707551d14bbd7e9e2ac",
