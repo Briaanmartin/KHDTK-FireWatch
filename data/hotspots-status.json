@@ -1,10 +1,10 @@
 {
   "schema_version": 1,
-  "checked_at": "2026-11-07T15:47:00Z",
+  "checked_at": "2026-11-07T20:20:01Z",
   "state": "partial",
   "last_success_at": "2026-11-04T06:43:43Z",
-  "window_start": "2026-10-31T15:47:00Z",
-  "window_end": "2026-11-07T15:47:00Z",
+  "window_start": "2026-10-31T20:20:01Z",
+  "window_end": "2026-11-07T20:20:01Z",
   "window_days": 7,
   "buffer_km": 25,
   "boundary_file": "boundary.geojson",
@@ -15,10 +15,10 @@
     -0.21247450265285364
   ],
   "distance_method": "Jarak sferis terpendek ke batas SHP; radius bumi 6371.0088 km.",
-  "feature_count": 64,
+  "feature_count": 65,
   "inside_count": 0,
   "stale_count": 1,
-  "latest_detection_at": "2026-11-06T18:28:00Z",
+  "latest_detection_at": "2026-11-07T17:11:00Z",
   "sources": [
     {
       "id": "VIIRS_SNPP_NRT",
@@ -40,10 +40,10 @@
       "satellite": "NOAA-20",
       "url": "https://firms.modaps.eosdis.nasa.gov/data/active_fire/noaa-20-viirs-c2/csv/J1_VIIRS_C2_SouthEast_Asia_7d.csv",
       "state": "ready",
-      "last_success_at": "2026-11-07T15:47:00Z",
-      "source_updated_at": "2026-11-07T15:42:40Z",
-      "latest_detection_at": "2026-11-07T07:18:00Z",
-      "regional_rows": 26120,
+      "last_success_at": "2026-11-07T20:20:01Z",
+      "source_updated_at": "2026-11-07T19:42:38Z",
+      "latest_detection_at": "2026-11-07T16:32:00Z",
+      "regional_rows": 26559,
       "feature_count": 28,
       "retained_count": 0,
       "error": null
@@ -54,11 +54,11 @@
       "satellite": "NOAA-21",
       "url": "https://firms.modaps.eosdis.nasa.gov/data/active_fire/noaa-21-viirs-c2/csv/J2_VIIRS_C2_SouthEast_Asia_7d.csv",
       "state": "ready",
-      "last_success_at": "2026-11-07T15:47:00Z",
-      "source_updated_at": "2026-11-07T15:45:46Z",
-      "latest_detection_at": "2026-11-07T08:00:00Z",
-      "regional_rows": 25369,
-      "feature_count": 35,
+      "last_success_at": "2026-11-07T20:20:01Z",
+      "source_updated_at": "2026-11-07T19:45:31Z",
+      "latest_detection_at": "2026-11-07T17:15:00Z",
+      "regional_rows": 26141,
+      "feature_count": 36,
       "retained_count": 0,
       "error": null
     }
