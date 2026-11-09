@@ -1,10 +1,10 @@
 {
   "schema_version": 1,
-  "checked_at": "2026-11-09T02:45:40Z",
+  "checked_at": "2026-11-09T11:51:48Z",
   "state": "partial",
   "last_success_at": "2026-11-04T06:43:43Z",
-  "window_start": "2026-11-02T02:45:40Z",
-  "window_end": "2026-11-09T02:45:40Z",
+  "window_start": "2026-11-02T11:51:48Z",
+  "window_end": "2026-11-09T11:51:48Z",
   "window_days": 7,
   "buffer_km": 25,
   "boundary_file": "boundary.geojson",
@@ -15,9 +15,9 @@
     -0.21247450265285364
   ],
   "distance_method": "Jarak sferis terpendek ke batas SHP; radius bumi 6371.0088 km.",
-  "feature_count": 73,
+  "feature_count": 69,
   "inside_count": 0,
-  "stale_count": 1,
+  "stale_count": 0,
   "latest_detection_at": "2026-11-08T17:49:00Z",
   "sources": [
     {
@@ -31,8 +31,8 @@
       "source_updated_at": "2026-11-04T05:48:40Z",
       "latest_detection_at": "2026-11-02T14:22:00Z",
       "regional_rows": null,
-      "feature_count": 1,
-      "retained_count": 1
+      "feature_count": 0,
+      "retained_count": 0
     },
     {
       "id": "VIIRS_NOAA20_NRT",
@@ -40,11 +40,11 @@
       "satellite": "NOAA-20",
       "url": "https://firms.modaps.eosdis.nasa.gov/data/active_fire/noaa-20-viirs-c2/csv/J1_VIIRS_C2_SouthEast_Asia_7d.csv",
       "state": "ready",
-      "last_success_at": "2026-11-09T02:45:40Z",
-      "source_updated_at": "2026-11-09T02:42:40Z",
-      "latest_detection_at": "2026-11-08T19:32:00Z",
-      "regional_rows": 25245,
-      "feature_count": 33,
+      "last_success_at": "2026-11-09T11:51:48Z",
+      "source_updated_at": "2026-11-09T11:43:57Z",
+      "latest_detection_at": "2026-11-09T06:39:00Z",
+      "regional_rows": 23461,
+      "feature_count": 30,
       "retained_count": 0,
       "error": null
     },
@@ -54,10 +54,10 @@
       "satellite": "NOAA-21",
       "url": "https://firms.modaps.eosdis.nasa.gov/data/active_fire/noaa-21-viirs-c2/csv/J2_VIIRS_C2_SouthEast_Asia_7d.csv",
       "state": "ready",
-      "last_success_at": "2026-11-09T02:45:40Z",
-      "source_updated_at": "2026-11-09T02:45:37Z",
-      "latest_detection_at": "2026-11-08T20:10:00Z",
-      "regional_rows": 26274,
+      "last_success_at": "2026-11-09T11:51:48Z",
+      "source_updated_at": "2026-11-09T11:48:52Z",
+      "latest_detection_at": "2026-11-09T07:24:00Z",
+      "regional_rows": 24529,
       "feature_count": 39,
       "retained_count": 0,
       "error": null
