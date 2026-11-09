@@ -1,10 +1,10 @@
 {
   "schema_version": 1,
-  "checked_at": "2026-11-09T11:51:48Z",
+  "checked_at": "2026-11-09T22:32:12Z",
   "state": "partial",
   "last_success_at": "2026-11-04T06:43:43Z",
-  "window_start": "2026-11-02T11:51:48Z",
-  "window_end": "2026-11-09T11:51:48Z",
+  "window_start": "2026-11-02T22:32:12Z",
+  "window_end": "2026-11-09T22:32:12Z",
   "window_days": 7,
   "buffer_km": 25,
   "boundary_file": "boundary.geojson",
@@ -15,10 +15,10 @@
     -0.21247450265285364
   ],
   "distance_method": "Jarak sferis terpendek ke batas SHP; radius bumi 6371.0088 km.",
-  "feature_count": 69,
+  "feature_count": 63,
   "inside_count": 0,
   "stale_count": 0,
-  "latest_detection_at": "2026-11-08T17:49:00Z",
+  "latest_detection_at": "2026-11-09T17:32:00Z",
   "sources": [
     {
       "id": "VIIRS_SNPP_NRT",
@@ -40,11 +40,11 @@
       "satellite": "NOAA-20",
       "url": "https://firms.modaps.eosdis.nasa.gov/data/active_fire/noaa-20-viirs-c2/csv/J1_VIIRS_C2_SouthEast_Asia_7d.csv",
       "state": "ready",
-      "last_success_at": "2026-11-09T11:51:48Z",
-      "source_updated_at": "2026-11-09T11:43:57Z",
-      "latest_detection_at": "2026-11-09T06:39:00Z",
-      "regional_rows": 23461,
-      "feature_count": 30,
+      "last_success_at": "2026-11-09T22:32:12Z",
+      "source_updated_at": "2026-11-09T21:44:15Z",
+      "latest_detection_at": "2026-11-09T17:34:00Z",
+      "regional_rows": 24023,
+      "feature_count": 29,
       "retained_count": 0,
       "error": null
     },
@@ -54,11 +54,11 @@
       "satellite": "NOAA-21",
       "url": "https://firms.modaps.eosdis.nasa.gov/data/active_fire/noaa-21-viirs-c2/csv/J2_VIIRS_C2_SouthEast_Asia_7d.csv",
       "state": "ready",
-      "last_success_at": "2026-11-09T11:51:48Z",
-      "source_updated_at": "2026-11-09T11:48:52Z",
+      "last_success_at": "2026-11-09T22:32:12Z",
+      "source_updated_at": "2026-11-09T21:48:26Z",
       "latest_detection_at": "2026-11-09T07:24:00Z",
       "regional_rows": 24529,
-      "feature_count": 39,
+      "feature_count": 34,
       "retained_count": 0,
       "error": null
     }
