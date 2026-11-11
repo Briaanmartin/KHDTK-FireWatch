@@ -1,13 +1,13 @@
 {
   "type": "FeatureCollection",
-  "generated_at": "2026-11-11T16:21:57Z",
+  "generated_at": "2026-11-11T22:53:19Z",
   "status": {
     "schema_version": 1,
-    "checked_at": "2026-11-11T16:21:57Z",
+    "checked_at": "2026-11-11T22:53:19Z",
     "state": "ready",
-    "last_success_at": "2026-11-11T16:21:57Z",
-    "window_start": "2026-11-04T16:21:57Z",
-    "window_end": "2026-11-11T16:21:57Z",
+    "last_success_at": "2026-11-11T22:53:19Z",
+    "window_start": "2026-11-04T22:53:19Z",
+    "window_end": "2026-11-11T22:53:19Z",
     "window_days": 7,
     "buffer_km": 25,
     "boundary_file": "boundary.geojson",
@@ -18,10 +18,10 @@
       -0.21247450265285364
     ],
     "distance_method": "Jarak sferis terpendek ke batas SHP; radius bumi 6371.0088 km.",
-    "feature_count": 42,
+    "feature_count": 34,
     "inside_count": 0,
     "stale_count": 0,
-    "latest_detection_at": "2026-11-11T05:54:00Z",
+    "latest_detection_at": "2026-11-11T17:38:00Z",
     "sources": [
       {
         "id": "VIIRS_SNPP_NRT",
@@ -29,8 +29,8 @@
         "satellite": "S-NPP",
         "url": "https://firms.modaps.eosdis.nasa.gov/data/active_fire/suomi-npp-viirs-c2/csv/SUOMI_VIIRS_C2_SouthEast_Asia_7d.csv",
         "state": "ready",
-        "last_success_at": "2026-11-11T16:21:57Z",
-        "source_updated_at": "2026-11-11T15:49:12Z",
+        "last_success_at": "2026-11-11T22:53:19Z",
+        "source_updated_at": "2026-11-11T22:49:53Z",
         "latest_detection_at": null,
         "regional_rows": 0,
         "feature_count": 0,
@@ -43,11 +43,11 @@
         "satellite": "NOAA-20",
         "url": "https://firms.modaps.eosdis.nasa.gov/data/active_fire/noaa-20-viirs-c2/csv/J1_VIIRS_C2_SouthEast_Asia_7d.csv",
         "state": "ready",
-        "last_success_at": "2026-11-11T16:21:57Z",
-        "source_updated_at": "2026-11-11T15:43:00Z",
-        "latest_detection_at": "2026-11-11T07:43:00Z",
-        "regional_rows": 22188,
-        "feature_count": 20,
+        "last_success_at": "2026-11-11T22:53:19Z",
+        "source_updated_at": "2026-11-11T22:42:57Z",
+        "latest_detection_at": "2026-11-11T20:10:00Z",
+        "regional_rows": 22781,
+        "feature_count": 15,
         "retained_count": 0,
         "error": null
       },
@@ -57,11 +57,11 @@
         "satellite": "NOAA-21",
         "url": "https://firms.modaps.eosdis.nasa.gov/data/active_fire/noaa-21-viirs-c2/csv/J2_VIIRS_C2_SouthEast_Asia_7d.csv",
         "state": "ready",
-        "last_success_at": "2026-11-11T16:21:57Z",
-        "source_updated_at": "2026-11-11T15:45:49Z",
-        "latest_detection_at": "2026-11-11T06:46:00Z",
-        "regional_rows": 22205,
-        "feature_count": 22,
+        "last_success_at": "2026-11-11T22:53:19Z",
+        "source_updated_at": "2026-11-11T22:46:07Z",
+        "latest_detection_at": "2026-11-11T19:19:00Z",
+        "regional_rows": 23328,
+        "feature_count": 19,
         "retained_count": 0,
         "error": null
       }
@@ -71,6 +71,151 @@
     "source_documentation": "https://firms.modaps.eosdis.nasa.gov/active_fire/"
   },
   "features": [
+    {
+      "type": "Feature",
+      "id": "f42b9e4644e5c29aec59",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          117.24474,
+          -0.48977
+        ]
+      },
+      "properties": {
+        "id": "f42b9e4644e5c29aec59",
+        "detected_at": "2026-11-11T17:38:00Z",
+        "latitude": -0.48977,
+        "longitude": 117.24474,
+        "confidence": "nominal",
+        "satellite": "NOAA-21",
+        "instrument": "VIIRS",
+        "source": "VIIRS_NOAA21_NRT",
+        "frp": 0.9,
+        "brightness": 305.78,
+        "daynight": "N",
+        "scan_km": 0.39,
+        "track_km": 0.36,
+        "inside_aoi": false,
+        "distance_km": 4.35,
+        "stale": false
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "4f0efe944c65572f2d13",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          117.26604,
+          -0.33281
+        ]
+      },
+      "properties": {
+        "id": "4f0efe944c65572f2d13",
+        "detected_at": "2026-11-11T17:38:00Z",
+        "latitude": -0.33281,
+        "longitude": 117.26604,
+        "confidence": "nominal",
+        "satellite": "NOAA-21",
+        "instrument": "VIIRS",
+        "source": "VIIRS_NOAA21_NRT",
+        "frp": 1.07,
+        "brightness": 305.9,
+        "daynight": "N",
+        "scan_km": 0.39,
+        "track_km": 0.36,
+        "inside_aoi": false,
+        "distance_km": 13.18,
+        "stale": false
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "3e32e0bb1418a457dccd",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          117.2626,
+          -0.33228
+        ]
+      },
+      "properties": {
+        "id": "3e32e0bb1418a457dccd",
+        "detected_at": "2026-11-11T17:38:00Z",
+        "latitude": -0.33228,
+        "longitude": 117.2626,
+        "confidence": "nominal",
+        "satellite": "NOAA-21",
+        "instrument": "VIIRS",
+        "source": "VIIRS_NOAA21_NRT",
+        "frp": 1.07,
+        "brightness": 307.9,
+        "daynight": "N",
+        "scan_km": 0.39,
+        "track_km": 0.36,
+        "inside_aoi": false,
+        "distance_km": 13.063,
+        "stale": false
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "74936290b3e158974293",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          117.38364,
+          -0.58246
+        ]
+      },
+      "properties": {
+        "id": "74936290b3e158974293",
+        "detected_at": "2026-11-11T16:54:00Z",
+        "latitude": -0.58246,
+        "longitude": 117.38364,
+        "confidence": "nominal",
+        "satellite": "NOAA-20",
+        "instrument": "VIIRS",
+        "source": "VIIRS_NOAA20_NRT",
+        "frp": 1.03,
+        "brightness": 302.71,
+        "daynight": "N",
+        "scan_km": 0.59,
+        "track_km": 0.7,
+        "inside_aoi": false,
+        "distance_km": 22.765,
+        "stale": false
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "39b21c3471d472f4cdd2",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          117.38219,
+          -0.58139
+        ]
+      },
+      "properties": {
+        "id": "39b21c3471d472f4cdd2",
+        "detected_at": "2026-11-11T16:54:00Z",
+        "latitude": -0.58139,
+        "longitude": 117.38219,
+        "confidence": "nominal",
+        "satellite": "NOAA-20",
+        "instrument": "VIIRS",
+        "source": "VIIRS_NOAA20_NRT",
+        "frp": 0.83,
+        "brightness": 303.36,
+        "daynight": "N",
+        "scan_km": 0.59,
+        "track_km": 0.7,
+        "inside_aoi": false,
+        "distance_km": 22.564,
+        "stale": false
+      }
+    },
     {
       "type": "Feature",
       "id": "6a77f17b473ab97ee726",
@@ -909,383 +1054,6 @@
         "track_km": 0.49,
         "inside_aoi": false,
         "distance_km": 16.913,
-        "stale": false
-      }
-    },
-    {
-      "type": "Feature",
-      "id": "e5c495a73998859a9c5c",
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          117.24349,
-          -0.55194
-        ]
-      },
-      "properties": {
-        "id": "e5c495a73998859a9c5c",
-        "detected_at": "2026-11-04T18:10:00Z",
-        "latitude": -0.55194,
-        "longitude": 117.24349,
-        "confidence": "nominal",
-        "satellite": "NOAA-21",
-        "instrument": "VIIRS",
-        "source": "VIIRS_NOAA21_NRT",
-        "frp": 0.24,
-        "brightness": 301.65,
-        "daynight": "N",
-        "scan_km": 0.34,
-        "track_km": 0.56,
-        "inside_aoi": false,
-        "distance_km": 10.605,
-        "stale": false
-      }
-    },
-    {
-      "type": "Feature",
-      "id": "8f2b6c76e62e7eebe736",
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          117.25732,
-          -0.54361
-        ]
-      },
-      "properties": {
-        "id": "8f2b6c76e62e7eebe736",
-        "detected_at": "2026-11-04T18:10:00Z",
-        "latitude": -0.54361,
-        "longitude": 117.25732,
-        "confidence": "nominal",
-        "satellite": "NOAA-21",
-        "instrument": "VIIRS",
-        "source": "VIIRS_NOAA21_NRT",
-        "frp": 0.89,
-        "brightness": 309.96,
-        "daynight": "N",
-        "scan_km": 0.35,
-        "track_km": 0.56,
-        "inside_aoi": false,
-        "distance_km": 10.233,
-        "stale": false
-      }
-    },
-    {
-      "type": "Feature",
-      "id": "5d0280dd0cc9b614d349",
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          117.24384,
-          -0.48898
-        ]
-      },
-      "properties": {
-        "id": "5d0280dd0cc9b614d349",
-        "detected_at": "2026-11-04T18:10:00Z",
-        "latitude": -0.48898,
-        "longitude": 117.24384,
-        "confidence": "nominal",
-        "satellite": "NOAA-21",
-        "instrument": "VIIRS",
-        "source": "VIIRS_NOAA21_NRT",
-        "frp": 1.23,
-        "brightness": 308.68,
-        "daynight": "N",
-        "scan_km": 0.34,
-        "track_km": 0.56,
-        "inside_aoi": false,
-        "distance_km": 4.219,
-        "stale": false
-      }
-    },
-    {
-      "type": "Feature",
-      "id": "454632f9603e56c7276a",
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          117.36227,
-          -0.53889
-        ]
-      },
-      "properties": {
-        "id": "454632f9603e56c7276a",
-        "detected_at": "2026-11-04T18:10:00Z",
-        "latitude": -0.53889,
-        "longitude": 117.36227,
-        "confidence": "nominal",
-        "satellite": "NOAA-21",
-        "instrument": "VIIRS",
-        "source": "VIIRS_NOAA21_NRT",
-        "frp": 1.1,
-        "brightness": 306.0,
-        "daynight": "N",
-        "scan_km": 0.35,
-        "track_km": 0.57,
-        "inside_aoi": false,
-        "distance_km": 18.121,
-        "stale": false
-      }
-    },
-    {
-      "type": "Feature",
-      "id": "2bbc9a48161778e2a08b",
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          117.24431,
-          -0.54682
-        ]
-      },
-      "properties": {
-        "id": "2bbc9a48161778e2a08b",
-        "detected_at": "2026-11-04T18:10:00Z",
-        "latitude": -0.54682,
-        "longitude": 117.24431,
-        "confidence": "nominal",
-        "satellite": "NOAA-21",
-        "instrument": "VIIRS",
-        "source": "VIIRS_NOAA21_NRT",
-        "frp": 2.07,
-        "brightness": 310.84,
-        "daynight": "N",
-        "scan_km": 0.34,
-        "track_km": 0.56,
-        "inside_aoi": false,
-        "distance_km": 10.079,
-        "stale": false
-      }
-    },
-    {
-      "type": "Feature",
-      "id": "2a388793f551802ef9f8",
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          117.34907,
-          -0.49982
-        ]
-      },
-      "properties": {
-        "id": "2a388793f551802ef9f8",
-        "detected_at": "2026-11-04T18:10:00Z",
-        "latitude": -0.49982,
-        "longitude": 117.34907,
-        "confidence": "nominal",
-        "satellite": "NOAA-21",
-        "instrument": "VIIRS",
-        "source": "VIIRS_NOAA21_NRT",
-        "frp": 2.17,
-        "brightness": 325.63,
-        "daynight": "N",
-        "scan_km": 0.35,
-        "track_km": 0.57,
-        "inside_aoi": false,
-        "distance_km": 14.803,
-        "stale": false
-      }
-    },
-    {
-      "type": "Feature",
-      "id": "e56a192d8f43ca8e2e0f",
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          117.24435,
-          -0.54632
-        ]
-      },
-      "properties": {
-        "id": "e56a192d8f43ca8e2e0f",
-        "detected_at": "2026-11-04T17:26:00Z",
-        "latitude": -0.54632,
-        "longitude": 117.24435,
-        "confidence": "nominal",
-        "satellite": "NOAA-20",
-        "instrument": "VIIRS",
-        "source": "VIIRS_NOAA20_NRT",
-        "frp": 1.96,
-        "brightness": 305.67,
-        "daynight": "N",
-        "scan_km": 0.53,
-        "track_km": 0.42,
-        "inside_aoi": false,
-        "distance_km": 10.026,
-        "stale": false
-      }
-    },
-    {
-      "type": "Feature",
-      "id": "da9a8397a9ebc1f77bc3",
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          117.25715,
-          -0.54292
-        ]
-      },
-      "properties": {
-        "id": "da9a8397a9ebc1f77bc3",
-        "detected_at": "2026-11-04T17:26:00Z",
-        "latitude": -0.54292,
-        "longitude": 117.25715,
-        "confidence": "nominal",
-        "satellite": "NOAA-20",
-        "instrument": "VIIRS",
-        "source": "VIIRS_NOAA20_NRT",
-        "frp": 1.54,
-        "brightness": 307.44,
-        "daynight": "N",
-        "scan_km": 0.53,
-        "track_km": 0.42,
-        "inside_aoi": false,
-        "distance_km": 10.155,
-        "stale": false
-      }
-    },
-    {
-      "type": "Feature",
-      "id": "908cc25257be337f3985",
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          117.34827,
-          -0.50003
-        ]
-      },
-      "properties": {
-        "id": "908cc25257be337f3985",
-        "detected_at": "2026-11-04T17:26:00Z",
-        "latitude": -0.50003,
-        "longitude": 117.34827,
-        "confidence": "nominal",
-        "satellite": "NOAA-20",
-        "instrument": "VIIRS",
-        "source": "VIIRS_NOAA20_NRT",
-        "frp": 3.14,
-        "brightness": 324.9,
-        "daynight": "N",
-        "scan_km": 0.52,
-        "track_km": 0.42,
-        "inside_aoi": false,
-        "distance_km": 14.73,
-        "stale": false
-      }
-    },
-    {
-      "type": "Feature",
-      "id": "70797eaeeba6d00d77af",
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          117.24374,
-          -0.55015
-        ]
-      },
-      "properties": {
-        "id": "70797eaeeba6d00d77af",
-        "detected_at": "2026-11-04T17:26:00Z",
-        "latitude": -0.55015,
-        "longitude": 117.24374,
-        "confidence": "nominal",
-        "satellite": "NOAA-20",
-        "instrument": "VIIRS",
-        "source": "VIIRS_NOAA20_NRT",
-        "frp": 3.54,
-        "brightness": 329.24,
-        "daynight": "N",
-        "scan_km": 0.53,
-        "track_km": 0.42,
-        "inside_aoi": false,
-        "distance_km": 10.42,
-        "stale": false
-      }
-    },
-    {
-      "type": "Feature",
-      "id": "6e7b36033e7dbc765138",
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          117.25443,
-          -0.54396
-        ]
-      },
-      "properties": {
-        "id": "6e7b36033e7dbc765138",
-        "detected_at": "2026-11-04T17:26:00Z",
-        "latitude": -0.54396,
-        "longitude": 117.25443,
-        "confidence": "nominal",
-        "satellite": "NOAA-20",
-        "instrument": "VIIRS",
-        "source": "VIIRS_NOAA20_NRT",
-        "frp": 2.02,
-        "brightness": 312.15,
-        "daynight": "N",
-        "scan_km": 0.53,
-        "track_km": 0.42,
-        "inside_aoi": false,
-        "distance_km": 10.143,
-        "stale": false
-      }
-    },
-    {
-      "type": "Feature",
-      "id": "2f487df9ec902894274b",
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          117.36069,
-          -0.54102
-        ]
-      },
-      "properties": {
-        "id": "2f487df9ec902894274b",
-        "detected_at": "2026-11-04T17:26:00Z",
-        "latitude": -0.54102,
-        "longitude": 117.36069,
-        "confidence": "nominal",
-        "satellite": "NOAA-20",
-        "instrument": "VIIRS",
-        "source": "VIIRS_NOAA20_NRT",
-        "frp": 1.5,
-        "brightness": 303.05,
-        "daynight": "N",
-        "scan_km": 0.52,
-        "track_km": 0.42,
-        "inside_aoi": false,
-        "distance_km": 18.086,
-        "stale": false
-      }
-    },
-    {
-      "type": "Feature",
-      "id": "1bec7cf19cfe7a19626f",
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          117.24177,
-          -0.54827
-        ]
-      },
-      "properties": {
-        "id": "1bec7cf19cfe7a19626f",
-        "detected_at": "2026-11-04T17:26:00Z",
-        "latitude": -0.54827,
-        "longitude": 117.24177,
-        "confidence": "nominal",
-        "satellite": "NOAA-20",
-        "instrument": "VIIRS",
-        "source": "VIIRS_NOAA20_NRT",
-        "frp": 4.82,
-        "brightness": 334.18,
-        "daynight": "N",
-        "scan_km": 0.53,
-        "track_km": 0.42,
-        "inside_aoi": false,
-        "distance_km": 10.163,
         "stale": false
       }
     }
