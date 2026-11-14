@@ -1,13 +1,13 @@
 {
   "type": "FeatureCollection",
-  "generated_at": "2026-11-14T19:19:01Z",
+  "generated_at": "2026-11-14T23:10:53Z",
   "status": {
     "schema_version": 1,
-    "checked_at": "2026-11-14T19:19:01Z",
+    "checked_at": "2026-11-14T23:10:53Z",
     "state": "partial",
     "last_success_at": "2026-11-14T14:20:17Z",
-    "window_start": "2026-11-07T19:19:01Z",
-    "window_end": "2026-11-14T19:19:01Z",
+    "window_start": "2026-11-07T23:10:53Z",
+    "window_end": "2026-11-14T23:10:53Z",
     "window_days": 7,
     "buffer_km": 25,
     "boundary_file": "boundary.geojson",
@@ -18,10 +18,10 @@
       -0.21247450265285364
     ],
     "distance_method": "Jarak sferis terpendek ke batas SHP; radius bumi 6371.0088 km.",
-    "feature_count": 21,
+    "feature_count": 23,
     "inside_count": 0,
     "stale_count": 0,
-    "latest_detection_at": "2026-11-14T16:41:00Z",
+    "latest_detection_at": "2026-11-14T17:38:00Z",
     "sources": [
       {
         "id": "VIIRS_SNPP_NRT",
@@ -43,11 +43,11 @@
         "satellite": "NOAA-20",
         "url": "https://firms.modaps.eosdis.nasa.gov/data/active_fire/noaa-20-viirs-c2/csv/J1_VIIRS_C2_SouthEast_Asia_7d.csv",
         "state": "ready",
-        "last_success_at": "2026-11-14T19:19:01Z",
-        "source_updated_at": "2026-11-14T18:43:00Z",
-        "latest_detection_at": "2026-11-14T16:00:00Z",
-        "regional_rows": 14911,
-        "feature_count": 9,
+        "last_success_at": "2026-11-14T23:10:53Z",
+        "source_updated_at": "2026-11-14T22:42:25Z",
+        "latest_detection_at": "2026-11-14T19:19:00Z",
+        "regional_rows": 15353,
+        "feature_count": 11,
         "retained_count": 0,
         "error": null
       },
@@ -57,10 +57,10 @@
         "satellite": "NOAA-21",
         "url": "https://firms.modaps.eosdis.nasa.gov/data/active_fire/noaa-21-viirs-c2/csv/J2_VIIRS_C2_SouthEast_Asia_7d.csv",
         "state": "ready",
-        "last_success_at": "2026-11-14T19:19:01Z",
-        "source_updated_at": "2026-11-14T18:46:00Z",
-        "latest_detection_at": "2026-11-14T16:43:00Z",
-        "regional_rows": 15848,
+        "last_success_at": "2026-11-14T23:10:53Z",
+        "source_updated_at": "2026-11-14T22:45:06Z",
+        "latest_detection_at": "2026-11-14T19:57:00Z",
+        "regional_rows": 16091,
         "feature_count": 12,
         "retained_count": 0,
         "error": null
@@ -71,6 +71,64 @@
     "source_documentation": "https://firms.modaps.eosdis.nasa.gov/active_fire/"
   },
   "features": [
+    {
+      "type": "Feature",
+      "id": "62bc690b3ca014c24f19",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          117.38549,
+          -0.58192
+        ]
+      },
+      "properties": {
+        "id": "62bc690b3ca014c24f19",
+        "detected_at": "2026-11-14T17:38:00Z",
+        "latitude": -0.58192,
+        "longitude": 117.38549,
+        "confidence": "nominal",
+        "satellite": "NOAA-20",
+        "instrument": "VIIRS",
+        "source": "VIIRS_NOAA20_NRT",
+        "frp": 1.81,
+        "brightness": 308.61,
+        "daynight": "N",
+        "scan_km": 0.39,
+        "track_km": 0.36,
+        "inside_aoi": false,
+        "distance_km": 22.894,
+        "stale": false
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "3bedae7879701e62c9a7",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          117.40676,
+          -0.53754
+        ]
+      },
+      "properties": {
+        "id": "3bedae7879701e62c9a7",
+        "detected_at": "2026-11-14T17:38:00Z",
+        "latitude": -0.53754,
+        "longitude": 117.40676,
+        "confidence": "nominal",
+        "satellite": "NOAA-20",
+        "instrument": "VIIRS",
+        "source": "VIIRS_NOAA20_NRT",
+        "frp": 0.99,
+        "brightness": 309.13,
+        "daynight": "N",
+        "scan_km": 0.39,
+        "track_km": 0.36,
+        "inside_aoi": false,
+        "distance_km": 22.388,
+        "stale": false
+      }
+    },
     {
       "type": "Feature",
       "id": "b13a0135d4973866cffa",
