@@ -1,13 +1,13 @@
 {
   "type": "FeatureCollection",
-  "generated_at": "2026-11-21T11:27:31Z",
+  "generated_at": "2026-11-21T19:31:28Z",
   "status": {
     "schema_version": 1,
-    "checked_at": "2026-11-21T11:27:31Z",
+    "checked_at": "2026-11-21T19:31:28Z",
     "state": "partial",
     "last_success_at": "2026-11-14T14:20:17Z",
-    "window_start": "2026-11-14T11:27:31Z",
-    "window_end": "2026-11-21T11:27:31Z",
+    "window_start": "2026-11-14T19:31:28Z",
+    "window_end": "2026-11-21T19:31:28Z",
     "window_days": 7,
     "buffer_km": 25,
     "boundary_file": "boundary.geojson",
@@ -18,7 +18,7 @@
       -0.21247450265285364
     ],
     "distance_method": "Jarak sferis terpendek ke batas SHP; radius bumi 6371.0088 km.",
-    "feature_count": 21,
+    "feature_count": 18,
     "inside_count": 0,
     "stale_count": 0,
     "latest_detection_at": "2026-11-21T05:10:00Z",
@@ -43,11 +43,11 @@
         "satellite": "NOAA-20",
         "url": "https://firms.modaps.eosdis.nasa.gov/data/active_fire/noaa-20-viirs-c2/csv/J1_VIIRS_C2_SouthEast_Asia_7d.csv",
         "state": "ready",
-        "last_success_at": "2026-11-21T11:27:31Z",
-        "source_updated_at": "2026-11-21T10:42:19Z",
-        "latest_detection_at": "2026-11-20T20:40:00Z",
-        "regional_rows": 10457,
-        "feature_count": 11,
+        "last_success_at": "2026-11-21T19:31:28Z",
+        "source_updated_at": "2026-11-21T18:43:15Z",
+        "latest_detection_at": "2026-11-21T15:28:00Z",
+        "regional_rows": 11744,
+        "feature_count": 9,
         "retained_count": 0,
         "error": null
       },
@@ -57,11 +57,11 @@
         "satellite": "NOAA-21",
         "url": "https://firms.modaps.eosdis.nasa.gov/data/active_fire/noaa-21-viirs-c2/csv/J2_VIIRS_C2_SouthEast_Asia_7d.csv",
         "state": "ready",
-        "last_success_at": "2026-11-21T11:27:31Z",
-        "source_updated_at": "2026-11-21T10:44:58Z",
-        "latest_detection_at": "2026-11-21T07:01:00Z",
-        "regional_rows": 12046,
-        "feature_count": 10,
+        "last_success_at": "2026-11-21T19:31:28Z",
+        "source_updated_at": "2026-11-21T18:46:11Z",
+        "latest_detection_at": "2026-11-21T16:11:00Z",
+        "regional_rows": 12394,
+        "feature_count": 9,
         "retained_count": 0,
         "error": null
       }
@@ -590,93 +590,6 @@
         "track_km": 0.64,
         "inside_aoi": false,
         "distance_km": 7.447,
-        "stale": false
-      }
-    },
-    {
-      "type": "Feature",
-      "id": "62bc690b3ca014c24f19",
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          117.38549,
-          -0.58192
-        ]
-      },
-      "properties": {
-        "id": "62bc690b3ca014c24f19",
-        "detected_at": "2026-11-14T17:38:00Z",
-        "latitude": -0.58192,
-        "longitude": 117.38549,
-        "confidence": "nominal",
-        "satellite": "NOAA-20",
-        "instrument": "VIIRS",
-        "source": "VIIRS_NOAA20_NRT",
-        "frp": 1.81,
-        "brightness": 308.61,
-        "daynight": "N",
-        "scan_km": 0.39,
-        "track_km": 0.36,
-        "inside_aoi": false,
-        "distance_km": 22.894,
-        "stale": false
-      }
-    },
-    {
-      "type": "Feature",
-      "id": "3bedae7879701e62c9a7",
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          117.40676,
-          -0.53754
-        ]
-      },
-      "properties": {
-        "id": "3bedae7879701e62c9a7",
-        "detected_at": "2026-11-14T17:38:00Z",
-        "latitude": -0.53754,
-        "longitude": 117.40676,
-        "confidence": "nominal",
-        "satellite": "NOAA-20",
-        "instrument": "VIIRS",
-        "source": "VIIRS_NOAA20_NRT",
-        "frp": 0.99,
-        "brightness": 309.13,
-        "daynight": "N",
-        "scan_km": 0.39,
-        "track_km": 0.36,
-        "inside_aoi": false,
-        "distance_km": 22.388,
-        "stale": false
-      }
-    },
-    {
-      "type": "Feature",
-      "id": "b13a0135d4973866cffa",
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          117.38322,
-          -0.5796
-        ]
-      },
-      "properties": {
-        "id": "b13a0135d4973866cffa",
-        "detected_at": "2026-11-14T16:41:00Z",
-        "latitude": -0.5796,
-        "longitude": 117.38322,
-        "confidence": "nominal",
-        "satellite": "NOAA-21",
-        "instrument": "VIIRS",
-        "source": "VIIRS_NOAA21_NRT",
-        "frp": 2.0,
-        "brightness": 299.38,
-        "daynight": "N",
-        "scan_km": 0.76,
-        "track_km": 0.77,
-        "inside_aoi": false,
-        "distance_km": 22.538,
         "stale": false
       }
     }
